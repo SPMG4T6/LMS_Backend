@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const Student = require('../models/student');
+const Student = require('../models/user');
 
 // get a list of students from the database
-router.get('/students',function(req,res,next){
+router.get('/users',function(req,res,next){
     Student.find({})
     .then(function(students){
         res.send(students);
@@ -12,7 +12,7 @@ router.get('/students',function(req,res,next){
 });
 
 // add a new student to database
-router.post('/students',function(req,res,next){
+router.post('/user',function(req,res,next){
     Student.create(req.body)
     .then(function(student){
         res.send(student);
@@ -21,7 +21,7 @@ router.post('/students',function(req,res,next){
 });
 
 // update a student in the database
-router.put('/students/:id',function(req,res,next){
+router.put('/user/:id',function(req,res,next){
     Student.findOneAndUpdate({_id: req.params.id},req.body)
     .then(function(student){
         Student.findOne({_id: req.params.id}).then(function(student){
@@ -31,7 +31,7 @@ router.put('/students/:id',function(req,res,next){
 });
 
 // delete a student in the database
-router.delete('/students/:id',function(req,res,next){
+router.delete('/user/:id',function(req,res,next){
     Student.findOneAndDelete({_id: req.params.id})
     .then(function(student){
         res.send(student);
