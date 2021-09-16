@@ -1,0 +1,5 @@
+# "npm install" to install them locally
+node_modules
+
+# confidential
+config.js
