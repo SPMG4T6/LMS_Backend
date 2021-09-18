@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
     courseID: {
         type: String,
+        unique: true,
         required: [true, 'courseID is required']
     },
     courseTitle: {

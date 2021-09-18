@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const ClassApplied = require('../models/classApplied');
 
-// get a list of students from the database
+// get a list all classes applied by learners from the database regardless of status
 router.get('/classApplieds',function(req,res,next) {
   ClassApplied.find({})
     .then(function(classApplieds){
@@ -11,7 +11,7 @@ router.get('/classApplieds',function(req,res,next) {
     .catch(next);
 });
 
-// add a new student to database
+// add a new class application by student to database
 router.post('/classApplied',function(req,res,next){
   ClassApplied.create(req.body)
     .then(function(classApplied){

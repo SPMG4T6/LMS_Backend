@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
     userID: {
         type: String,
+        unique: true,
         required: [true, 'userID is required']
     },
     userName: {
