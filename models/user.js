@@ -3,18 +3,25 @@ const Schema = mongoose.Schema;
 
 // create student schema & model
 const UserSchema = new Schema({
-    name: {
+    userID: {
         type: String,
-        required: [true, 'name field is required']
+        required: [true, 'userID is required']
     },
-    occupationType: {
+    userName: {
         type: String,
-        required: [true, 'occupationType field is required']
+        required: [true, 'userName is required']
     },
-    trainer: {
-        type: Boolean,
-        default: true
+    // 'HR', 'Trainer' 'Engineer'
+    userType: {
+        type: String,
+        default: 'Engineer'
+    },
+    involvedCourses: {
+        type: Array
+    },
+    completedCourses: {
+        type: Array
     }
 });
 
-module.exports = mongoose.model('users', UserSchema);
+module.exports = mongoose.model('user', UserSchema);
