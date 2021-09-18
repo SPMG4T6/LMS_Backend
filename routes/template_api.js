@@ -3,7 +3,7 @@ const router = express.Router();
 const Student = require('../models/user');
 
 // get a list of students from the database
-router.get('/users',function(req,res,next){
+router.get('/users',function(req,res,next) {
     Student.find({})
     .then(function(students){
         res.send(students);

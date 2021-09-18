@@ -10,12 +10,21 @@ const app = express();
 mongoose.connect(config.MONGODB);
 mongoose.Promise = global.Promise;
 
-app.use(express.static('public'));
+// app.use(express.static('public'));
 app.use(cors());
 app.use(express.json());
 
 // initialize routes
-app.use('/api',require('./routes/api'));
+// app.use('/api', require('./routes/template_api'));
+app.use('/api', require('./routes/userAPI'));
+app.use('/api', require('./routes/gradeAPI'));
+app.use('/api', require('./routes/sectionAPI'));
+app.use('/api', require('./routes/classAPI'));
+app.use('/api', require('./routes/courseAPI'));
+app.use('/api', require('./routes/progressAPI'));
+app.use('/api', require('./routes/classAppliedAPI'));
+// app.use('/api', require('./routes/forumAPI'));
+// app.use('/api', require('./routes/chatAPI'));
 
 // error handling middleware
 app.use(function(err,req,res,next){
