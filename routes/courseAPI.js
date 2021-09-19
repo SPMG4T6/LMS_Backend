@@ -20,8 +20,8 @@ router.post('/course',function(req,res,next){
     .catch(next);
 });
 
-// update a course detail (only course title and description and prereqs allowed) in the database
-router.put('/course/:courseID',function(req,res){
+// update a course detail (only course title and description and prereqs allowed for now) in the database
+router.put('/course/:courseCode',function(req,res){
   let fieldsToUpdate = {
     courseTitle: req.body.courseTitle,
     courseDeciption: req.body.courseDescription,

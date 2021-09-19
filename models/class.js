@@ -3,13 +3,9 @@ const Schema = mongoose.Schema;
 
 // create student schema & model
 const ClassSchema = new Schema({
-    classID: {
+    courseCode: {
         type: String,
-        required: [true, 'classID is required']
-    },
-    courseID: {
-        type: String,
-        required: [true, 'courseID is required']
+        required: [true, 'courseCode is required']
     },
     className: {
         type: String,

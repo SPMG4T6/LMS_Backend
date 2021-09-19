@@ -3,17 +3,13 @@ const Schema = mongoose.Schema;
 
 // create student schema & model
 const SectionSchema = new Schema({
-    courseID: {
+    courseCode: {
         type: String,
-        required: [true, 'courseID is required']
+        required: [true, 'courseCode is required']
     },
-    classID: {
+    className: {
         type: String,
-        required: [true, 'classID is required']
-    },
-    sectionID: {
-        type: String,
-        required: [true, 'sectionID is required']
+        required: [true, 'className is required']
     },
     sectionName: {
         type: String,
