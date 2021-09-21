@@ -114,9 +114,9 @@ router.put('/course/:courseCode',function(req,res) {
     }
   }
 
-  Course.findOneAndUpdate({courseID: req.params.courseID}, { $set: { ...fieldsToUpdate } } )
+  Course.findOneAndUpdate({courseCode: req.params.courseCode}, { $set: { ...fieldsToUpdate } } )
   .then(function(course){
-    Course.findOne({courseID: req.params.courseID}).then(function(course){
+    Course.findOne({courseID: req.params.courseCode}).then(function(course){
           res.send(course);
       });
   });
