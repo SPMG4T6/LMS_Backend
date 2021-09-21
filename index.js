@@ -6,6 +6,39 @@ const config = require('./config');
 // set up our express app
 const app = express();
 
+// set up swagger-ui
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsDoc = require("swagger-jsdoc");
+const options = {
+  definition: {
+    openapi: "3.0.3", // present supported openapi version
+    info: {
+      title: "LMS Backend API", // short title.
+      description: "LMS Backend", //  desc.
+      version: "1.0.0", // version number
+      // contact: {
+      //   name: "John doe", // your name
+      //   email: "john@web.com", // your email
+      //   url: "web.com", // your website
+      // },
+    },
+    servers: [
+      {
+        url: "http://localhost:5000/api"
+      }
+    ],
+  },
+  apis: ["./routes/*.js"]
+}
+
+const specs = swaggerJsDoc(options);
+app.use(
+  "/swagger",
+  swaggerUi.serve,
+  swaggerUi.setup(specs)
+);
+
+
 // connect to mongodb
 mongoose.connect(config.MONGODB);
 mongoose.Promise = global.Promise;
@@ -15,7 +48,6 @@ app.use(cors());
 app.use(express.json());
 
 // initialize routes
-// app.use('/api', require('./routes/template_api'));
 app.use('/api', require('./routes/userAPI'));
 app.use('/api', require('./routes/gradeAPI'));
 app.use('/api', require('./routes/sectionAPI'));
