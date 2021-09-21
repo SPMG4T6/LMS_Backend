@@ -33,7 +33,7 @@ const options = {
 
 const specs = swaggerJsDoc(options);
 app.use(
-  "/",
+  "/swagger",
   swaggerUi.serve,
   swaggerUi.setup(specs)
 );
