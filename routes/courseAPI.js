@@ -43,11 +43,14 @@ router.get('/courses',function(req,res,next) {
  *                type: string
  *              prereqCourses:
  *                type: string
+ *              quizPassingMark:
+ *                type: string
+ *                example: 70
  *            required:
  *              - courseCode
  *              - courseTitle
  *              - courseDescription
- *              - prereqCourses
+ *              - quizPassingMark
  *    responses:
  *      '200':
  *        description: A successful response
@@ -63,7 +66,7 @@ router.post('/course',function(req,res,next){
 
 /**
  * @swagger
- * /course/:courseCode:
+ * /course/{courseCode}:
  *  put:
  *    summary: Update a course detail
  *    description: Update a course detail (only course title and description and prereqs allowed for now) in the database
@@ -83,19 +86,21 @@ router.post('/course',function(req,res,next){
  *          schema:
  *            type: object
  *            properties:
- *              courseCode:
- *                type: string
  *              courseTitle:
  *                type: string
  *              courseDescription:
  *                type: string
  *              prereqCourses:
+ *                type: array
+ *                items:
+ *                  type: string
+ *              quizPassingMark:
  *                type: string
+ *                example: 70
  *            required:
- *              - courseCode
  *              - courseTitle
  *              - courseDescription
- *              - prereqCourses
+ *              - quizPassingMark
  *    responses:
  *      '200':
  *        description: A successful response
@@ -104,22 +109,22 @@ router.post('/course',function(req,res,next){
 router.put('/course/:courseCode',function(req,res) {
   let fieldsToUpdate = {
     courseTitle: req.body.courseTitle,
-    courseDeciption: req.body.courseDescription,
+    courseDescription: req.body.courseDescription,
     prereqCourses: req.body.prereqCourses
   }
   
+  // To remove blank fields
   for (const [key, value] of Object.entries(fieldsToUpdate)) {
     if (!value) {
       delete fieldsToUpdate[key]
     }
   }
 
-  Course.findOneAndUpdate({courseCode: req.params.courseCode}, { $set: { ...fieldsToUpdate } } )
-  .then(function(course){
-    Course.findOne({courseID: req.params.courseCode}).then(function(course){
-          res.send(course);
-      });
-  });
+  Course.findOneAndUpdate({courseCode: req.params.courseCode}, fieldsToUpdate, { new: true }, (err, doc) => {
+    if (err) { res.status(404).json({ error: "Course not found" }) };
+    res.send(doc);
+  })
+  
 });
 
 module.exports = router;

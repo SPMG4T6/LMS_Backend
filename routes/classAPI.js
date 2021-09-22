@@ -27,6 +27,7 @@ router.get('/classes',function(req,res,next) {
  * /class:
  *  post:
  *    summary: Create a class
+ *    description: Quiz duration is in minutes
  *    tags: [class]
  *    requestBody:
  *      required: true
@@ -43,6 +44,23 @@ router.get('/classes',function(req,res,next) {
  *                type: array
  *                items:
  *                  type: string
+ *              quizDetails:
+ *                type: array
+ *                items:
+ *                  type: object
+ *                  properties:
+ *                    question:
+ *                      type: string
+ *                      example: What is the right way to eat?
+ *                    option:
+ *                      type: array
+ *                      items:
+ *                        type: string
+ *                    answer:
+ *                      type: string
+ *                    duration:
+ *                      type: integer
+ *                      example: 10
  *              classStartDate:
  *                type: string
  *                pattern: '^\d{2}/\d{2}/\d{4}$'
@@ -87,7 +105,6 @@ router.get('/classes',function(req,res,next) {
 router.post('/class', async function(req,res,next){
 
   var course = await Course.find({ courseID: req.body.courseID }).exec();
-  console.log(course)
   if (course == null) {
     Class.create(req.body)
       .then(function(aClass){
@@ -97,5 +114,54 @@ router.post('/class', async function(req,res,next){
   } else { res.status(404).json({ error: "Course not found" }) }
   
 });
+
+/**
+ * @swagger
+ * /class/quiz/{courseCode}/{className}:
+ *  put:
+ *    summary: Update the graded class quiz
+ *    description: Quiz duration is in minutes
+ *    tags: [class]
+ *    requestBody:
+ *      required: true
+ *      content: 
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              quizDetails:
+ *                type: array
+ *                items:
+ *                  type: object
+ *                  properties:
+ *                    question:
+ *                      type: string
+ *                      example: What is the right way to eat?
+ *                    option:
+ *                      type: array
+ *                      items:
+ *                        type: string
+ *                    answer:
+ *                      type: string
+ *                    duration:
+ *                      type: integer
+ *                      example: 10
+ *            required:
+ *              - quizDetails
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
+// Update a grade quiz for the class
+router.put('/class/quiz/:courseCode/:className/', async function(req,res,next){
+
+  let quizDetails = req.body.quizDetails;
+
+  // replaces the entire quiz details
+  Section.findOneAndUpdate({ courseCode: req.params.courseCode, className: req.params.className }, { quizDetails: quizDetails }, { new: true }, (err, doc) => {
+    if (err) { res.status(404).json({ error: "Class not found" }) };
+    res.send(doc); // returns the update
+  });
+})
 
 module.exports = router;

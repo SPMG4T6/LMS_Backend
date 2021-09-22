@@ -16,6 +16,11 @@ const ClassSchema = new Schema({
         type: Array,
         required: [true, 'userID is required']
     },
+    // [{question: "Something", option: [1, 2, 3, 4], answer: 1}, ...]
+    quizDetails: {
+        type: Array,
+        required: [true, 'quizDetails is required']
+    },
     classStartDate: {
         type: Date,
         required: [true, 'classStartDate is required']
