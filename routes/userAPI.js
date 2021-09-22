@@ -44,7 +44,11 @@ router.get('/users',function(req,res,next) {
  *                - learner
  *                - hr
  *                - trainer
- *              involvedCourses:
+ *              learningCourses:
+ *                type: array
+ *                items:
+ *                  type: string
+ *              teachingCourses:
  *                type: array
  *                items:
  *                  type: string
@@ -101,7 +105,11 @@ router.post('/user',function(req,res,next){
  *                - learner
  *                - hr
  *                - trainer
- *              involvedCourses:
+ *              learningCourses:
+ *                type: array
+ *                items:
+ *                  type: string
+ *              teachingCourses:
  *                type: array
  *                items:
  *                  type: string
