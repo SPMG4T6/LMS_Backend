@@ -19,6 +19,10 @@ const CourseSchema = new Schema({
     // array of courseID
     prereqCourses: {
         type: Array
+    },
+    quizPassingMark: {
+        type: String,
+        required: [true, 'quizPassingMark is required']
     }
 });
 

@@ -24,15 +24,12 @@ const SectionSchema = new Schema({
         type: Array,
         required: [true, 'quizDetails is required']
     },
-    quizPassingMark: {
-        type: String,
-        required: [true, 'quizPassingMark is required']
-    },
     // array of objects, [{materialName: "something", materialLink: "www.google.com"}, ...]
     courseMaterial: {
         type: Array,
         required: [true, 'courseMaterial is required']
     }
 });
+
 
 module.exports = mongoose.model('section', SectionSchema);
