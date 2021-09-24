@@ -24,28 +24,17 @@ router.get('/classes',function(req,res,next) {
 
 /**
  * @swagger
- * /course/class/view:
- *  post:
+ * /classes/view/{courseCode}:
+ *  get:
  *    summary: Get classes by courseCode
  *    tags: [class]
- *    requestBody:
- *      required: true
- *      content: 
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              courseCode:
- *                type: string
- *            required:
- *              - courseCode
  *    responses:
  *      '200':
  *        description: A successful response
  */
 // get class details by courseCode
-router.post('/course/class/view', function(req,res,next) {
-  ClassModel.find({"courseCode": req.body.courseCode})
+router.get('/classes/view/:courseCode', function(req,res,next) {
+  ClassModel.find({"courseCode": req.params.courseCode})
   .then(function(classes) {
     res.send(classes);
   })
