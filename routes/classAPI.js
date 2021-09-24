@@ -24,7 +24,7 @@ router.get('/classes',function(req,res,next) {
 
 /**
  * @swagger
- * /class:
+ * /course/class/view:
  *  post:
  *    summary: Get classes by courseCode
  *    tags: [class]
