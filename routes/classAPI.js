@@ -26,6 +26,36 @@ router.get('/classes',function(req,res,next) {
  * @swagger
  * /class:
  *  post:
+ *    summary: Get classes by courseCode
+ *    tags: [class]
+ *    requestBody:
+ *      required: true
+ *      content: 
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              courseCode:
+ *                type: string
+ *            required:
+ *              - courseCode
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
+// get class details by courseCode
+router.post('/course/class/view', function(req,res,next) {
+  ClassModel.find({"courseCode": req.body.courseCode})
+  .then(function(classes) {
+    res.send(classes);
+  })
+  .catch(next);
+});
+
+/**
+ * @swagger
+ * /class:
+ *  post:
  *    summary: Create a class
  *    description: Quiz duration is in minutes
  *    tags: [class]
