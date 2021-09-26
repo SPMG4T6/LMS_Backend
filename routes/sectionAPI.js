@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Section = require('../models/section');
+const fs = require('fs');
+const AWS = require('aws-sdk');
+AWS.config.loadFromPath('./config.json');
 
 /**
  * @swagger
