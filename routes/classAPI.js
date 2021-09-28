@@ -82,19 +82,15 @@ router.get('/classes/view/:courseCode', function(req,res,next) {
  *                      example: 10
  *              classStartDate:
  *                type: string
- *                pattern: '^\d{2}/\d{2}/\d{4}$'
  *                example: 22/06/2021
  *              classEndDate:
  *                type: string
- *                pattern: '^\d{2}/\d{2}/\d{4}$'
  *                example: 15/10/2021
  *              enrolmentStartDate:
  *                type: string
- *                pattern: '^\d{2}/\d{2}/\d{4}$'
  *                example: 15/06/2021
  *              enrolmentEndDate:
  *                type: string
- *                pattern: '^\d{2}/\d{2}/\d{4}$'
  *                example: 21/09/2021
  *              minClassSize:
  *                type: integer
@@ -269,6 +265,5 @@ router.put('/class/enrol/:userID', async function(req,res,next){
     res.status(404).json({ error: "User not found" })
   }
 })
-
 
 module.exports = router;

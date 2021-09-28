@@ -56,7 +56,7 @@ router.get('/sections',function(req,res,next) {
  *                        type: string
  *                    answer:
  *                      type: string
- *              courseMaterial:
+ *              sectionMaterial:
  *                type: array
  *                items:
  *                  type: object
@@ -73,7 +73,7 @@ router.get('/sections',function(req,res,next) {
  *              - sectionName
  *              - sectionSequence
  *              - quizDetails
- *              - courseMaterial
+ *              - sectionMaterial
  *    responses:
  *      '200':
  *        description: A successful response
@@ -160,5 +160,59 @@ router.put('/section/quiz/:courseCode/:className/:sectionName', async function(r
     res.send(doc);
   });
 })
+
+/**
+ * @swagger
+ * /section/material/{courseCode}/{className}/{sectionName}/{materialName}:
+ *  get:
+ *    summary: Get section material's link
+ *    description: Retrieve the material link
+ *    tags: [section]
+ *    parameters:
+ *        - in: path
+ *          name: courseCode
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: Course Code
+ *          example: Programming for Xerox WorkCentre with Card Access and Integration
+ *        - in: path
+ *          name: className
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: Class Name
+ *          example: G14
+ *        - in: path
+ *          name: sectionName 
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: Section Name
+ *          example: Regression
+ *        - in: path
+ *          name: materialName
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: Name of the Material
+ *          example: Regression Notes
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
+// Returning the specific document hyperlink
+router.get('/section/material/:courseCode/:className/:sectionName/:materialName', async function(req,res,next) {
+  const doc = await Section.findOne({courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName})
+  
+  if (doc === null) res.status(404).json({ error: "Section do not " + req.params.materialName });
+
+  const material = req.params.materialName;
+  for (let i = 0; i < doc.sectionMaterial.length; i++) {
+    if (doc.sectionMaterial[i].materialName = material) {
+      res.send(doc.sectionMaterial[i].materialLink)
+    }
+  }
+});
 
 module.exports = router;
