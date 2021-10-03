@@ -57,7 +57,7 @@ router.get('/sections',function(req,res,next) {
  *                      type: integer
  *              quizPassingMark:
  *                type: string
- *              courseMaterial:
+ *              sectionMaterial:
  *                type: array
  *                items:
  *                  type: object
@@ -75,7 +75,7 @@ router.get('/sections',function(req,res,next) {
  *                - sectionSequence
  *                - quizDetails
  *                - quizPassingMark
- *                - courseMaterial
+ *                - sectionMaterial
  *    responses:
  *      '200':
  *        description: A successful response
