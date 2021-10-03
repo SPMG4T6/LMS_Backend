@@ -16,20 +16,25 @@ const ClassSchema = new Schema({
         type: Array,
         required: [true, 'userID is required']
     },
+    // [{question: "Something", option: [1, 2, 3, 4], answer: 1}, ...]
+    quizDetails: {
+        type: Array,
+        required: [true, 'quizDetails is required']
+    },
     classStartDate: {
-        type: Date,
+        type: String,
         required: [true, 'classStartDate is required']
     },
     classEndDate: {
-        type: Date,
+        type: String,
         required: [true, 'classEndDate is required']
     },
     enrolmentStartDate: {
-        type: Date,
+        type: String,
         required: [true, 'enrolmentStartDate is required']
     },
     enrolmentEndDate: {
-        type: Date,
+        type: String,
         required: [true, 'enrolmentEndDate is required']
     },
     minClassSize: {

@@ -17,7 +17,10 @@ const UserSchema = new Schema({
         type: String,
         default: 'Engineer'
     },
-    involvedCourses: {
+    learningCourses: {
+        type: Array
+    },
+    teachingCourses: {
         type: Array
     },
     completedCourses: {

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Student = require('../models/user');
+const User = require('../models/user');
 
 /**
  * @swagger
@@ -14,9 +14,9 @@ const Student = require('../models/user');
  */
 // get a list of all users from the database
 router.get('/users',function(req,res,next) {
-    Student.find({})
-    .then(function(students){
-        res.send(students);
+    User.find({})
+    .then(function(users){
+        res.send(users);
     })
     .catch(next);
 });
@@ -44,7 +44,11 @@ router.get('/users',function(req,res,next) {
  *                - learner
  *                - hr
  *                - trainer
- *              involvedCourses:
+ *              learningCourses:
+ *                type: array
+ *                items:
+ *                  type: string
+ *              teachingCourses:
  *                type: array
  *                items:
  *                  type: string
@@ -64,16 +68,16 @@ router.get('/users',function(req,res,next) {
  */
 // add a new user to database
 router.post('/user',function(req,res,next){
-    Student.create(req.body)
-    .then(function(student){
-        res.send(student);
+    User.create(req.body)
+    .then(function(user){
+        res.send(user);
     })
     .catch(next);
 });
 
 /**
  * @swagger
- * /user/:userID:
+ * /user/{userID}:
  *  put:
  *    summary: Update a user
  *    tags: [user]
@@ -101,7 +105,11 @@ router.post('/user',function(req,res,next){
  *                - learner
  *                - hr
  *                - trainer
- *              involvedCourses:
+ *              learningCourses:
+ *                type: array
+ *                items:
+ *                  type: string
+ *              teachingCourses:
  *                type: array
  *                items:
  *                  type: string
@@ -120,18 +128,16 @@ router.post('/user',function(req,res,next){
  *        description: A successful response
  */
 // update a user in the database
-router.put('/user/:id',function(req,res,next){
-    Student.findOneAndUpdate({_id: req.params.id},req.body)
-    .then(function(student){
-        Student.findOne({_id: req.params.id}).then(function(student){
-            res.send(student);
-        });
+router.put('/user/:userID', function(req,res,next){
+    User.findOneAndUpdate({_id: req.params.userID},req.body, { new: true }, (err, doc) => {
+        if (err) res.status(404).json({ error: "User not found" });
+        res.send(doc);
     });
 });
 
 /**
  * @swagger
- * /user/:userID:
+ * /user/{userID}:
  *  delete:
  *    summary: Delete a user
  *    tags: [user]
@@ -142,29 +148,15 @@ router.put('/user/:id',function(req,res,next){
  *            type: string
  *          required: true
  *          description: A user's ID
- *    requestBody:
- *      required: true
- *      content: 
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              userID:
- *                type: string
- *              userName:
- *                type: string
- *          required:
- *            - userID
- *            - userName
  *    responses:
  *      '200':
  *        description: A successful response
  */
 // delete a user from the database
-router.delete('/user/:id',function(req,res,next){
-    Student.findOneAndDelete({_id: req.params.id})
-    .then(function(student){
-        res.send(student);
+router.delete('/user/:userID',function(req,res,next){
+    User.findOneAndDelete({_id: req.params.userID})
+    .then(function(user){
+        res.send(user);
     });
 });
 
