@@ -61,7 +61,9 @@ router.get('/course/view/:courseCode', function(req,res,next) {
  *              courseDescription:
  *                type: string
  *              prereqCourses:
- *                type: string
+ *                type: array
+ *                items:
+ *                  type: string
  *              quizPassingMark:
  *                type: string
  *                example: 70
