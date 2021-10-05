@@ -3,3 +3,6 @@ node_modules
 
 # confidential
 config.js
+
+# aws config
+routes/config.json
