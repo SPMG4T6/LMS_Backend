@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Section = require('../models/section');
-const fs = require('fs');
-const AWS = require('aws-sdk');
-AWS.config.loadFromPath('./config.json');
+// const fs = require('fs');
+// const AWS = require('aws-sdk');
+// AWS.config.loadFromPath('./config.json');
 
 /**
  * @swagger
@@ -23,6 +23,44 @@ router.get('/sections',function(req,res,next) {
     })
     .catch(next);
 });
+
+/**
+ * @swagger
+ * /sections/{courseCode}/{className}:
+ *  get:
+ *    summary: Get a list of sections within a specific class of a specific course
+ *    tags: [section]
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
+// get a list of all sections within a specific class of a specific course
+router.get('/sections/:courseCode/:className', function(req, res, next) {
+  Section.find({"courseCode": req.params.courseCode, "className": req.params.className})
+  .then(function(sections) {
+    res.send(sections);
+  })
+  .catch(next);
+}) 
+
+/**
+ * @swagger
+ * /sections/{courseCode}/{className}/{sectionName}:
+ *  get:
+ *    summary: Get a specific section within a specific class of a specific course
+ *    tags: [section]
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
+// get a section within a specific class of a specific course
+router.get('/sections/:courseCode/:className/:sectionName', function(req, res, next) {
+  Section.find({"courseCode": req.params.courseCode, "className": req.params.className, "sectionName": req.params.sectionName.replace("+", " ")})
+  .then(function(sections) {
+    res.send(sections);
+  })
+  .catch(next);
+}) 
 
 /**
  * @swagger
