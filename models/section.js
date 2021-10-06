@@ -25,9 +25,9 @@ const SectionSchema = new Schema({
         required: [true, 'quizDetails is required']
     },
     // array of objects, [{materialName: "something", materialLink: "www.google.com"}, ...]
-    courseMaterial: {
+    sectionMaterial: {
         type: Array,
-        required: [true, 'courseMaterial is required']
+        required: [true, 'sectionMaterial is required']
     }
 });
 
