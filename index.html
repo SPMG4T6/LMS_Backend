@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@100;400;700;900&display=swap" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" />
+    <!-- style.css file path in the line below. -->
+    <link rel="stylesheet" href="/css/style.css" />
+    <!-- -------------------------------------- -->
+    <title>Multer Tutorial</title>
+</head>
+
+<body>
+    <main class="admin">
+        <div class="admin__upload-file" style="width: 80%">
+            <form action="http://localhost:5000/api/section" enctype="multipart/form-data" method="post"
+                style="display: flex; flex-direction: column;">
+                <div>
+                    <span>Material name</span>
+                    <input type='text' class='admin__input' name='materialName'>
+                    <span>Select type: </span>
+                    <select name='materialType'>
+                        <option value='urlType'>URL</option>
+                        <option value='uploadType'>File Upload</option>
+                    </select>
+                    <input type="file" class="admin__input" name="myFile" />
+                </div>
+                <div>
+                    <span>Material name</span>
+                    <input type='text' class='admin__input' name='materialName'>
+                    <span>Select type: </span>
+                    <select name='materialType'>
+                        <option value='urlType'>URL</option>
+                        <option value='uploadType'>File Upload</option>
+                    </select>
+                    <input type='text' name='myURL'>
+                    <input type="file" class="admin__input" name="myFile" />
+                </div>
+                <div>
+                    <span>Material name</span>
+                    <input type='text' class='admin__input' name='materialName'>
+                    <span>Select type: </span>
+                    <select name='materialType'>
+                        <option value='urlType'>URL</option>
+                        <option value='uploadType'>File Upload</option>
+                    </select>
+                    <input type="file" class="admin__input" name="myFile" />
+                </div>
+                <input class="admin__submit" type="submit" style="width: 100px;" />
+                <!-- <button class='submitButton'>Submit</button> -->
+                <input type="hidden" name="courseCode" value="IS442">
+                <input type="hidden" name="className" value="G14">
+                <input type="hidden" name="sectionName" value="Machine Learning">
+                <input type="hidden" name="sectionSequence" value="2">
+            </form>
+        </div>
+    </main>
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    
+    
+
+</script>
+
+</html>
