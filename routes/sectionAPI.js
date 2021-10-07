@@ -1,9 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const Section = require('../models/section');
-// const fs = require('fs');
-// const AWS = require('aws-sdk');
-// AWS.config.loadFromPath('./config.json');
+const multer = require("multer");
+const uploadController = require('./uploadController');
+
+
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+      cb(null, "public/files");
+  },
+  filename: (req, file, cb) => {
+      const ext = file.mimetype.split("/")[1];
+      const fileName = file.originalname.split(".")[0];
+      cb(null, `${fileName}.${ext}`);
+  },
+});
+
+const upload = multer({
+  storage: multerStorage
+});
 
 /**
  * @swagger
@@ -125,14 +140,24 @@ router.get('/sections/:courseCode/:className/:sectionName', function(req, res, n
  *      '200':
  *        description: A successful response
  */
-// add a new section of clahttps://elearn.smu.edu.sg/d2l/le/content/302948/viewContent/1827058/Viewss to database
-router.post('/section',function(req,res,next){
-  Section.create(req.body)
-    .then(function(section){
-        res.send(section);
-    })
-    .catch(next);
+// add a new section of class to database
+router.post('/section',upload.array("myFile"), (req, res) => {
+  uploadController(req)
+  .then((response) => {
+    const sectionMaterial = response;
+    delete req.body.materialName;
+    delete req.body.materialType;
+    delete req.body.myURL;
+    req.body["sectionMaterial"] = sectionMaterial;
+    req.body["quizDetails"] = [];
+    Section.create(req.body)
+    .then(function(section) {
+      console.log("section created");
+      res.send(section);
+    }) 
+  }) 
 });
+
 
 /**
  * @swagger
