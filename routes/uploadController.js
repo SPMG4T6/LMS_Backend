@@ -2,6 +2,10 @@ const uploadToS3 = require('./upload-to-s3');
 
 const uploadController = (req) =>
     new Promise((resolve, reject) => {
+        if (Object.keys(req.body).length === 0 && req.body.constructor === Object) {
+            reject("No body is attached");
+        }
+
         let sectionMaterial = [];
         let promiseArray = [];
         let toUploadCounter = 0;
@@ -24,23 +28,25 @@ const uploadController = (req) =>
         for (var i = 0; i < req.body.materialName.length; i++) {
             let materialObject = {};
             let currMaterialName = materialNameArray[i];
-            let currMaterialType = materialTypeArray[i];
-            if (currMaterialType == "uploadType") {
-                toUploadCounter++;
-                let file = filesArray[toUploadCounter-1];
-                promiseArray.push(uploadToS3({materialName: currMaterialName, file: file, folderName: folderName}));
-            }
-            else if (currMaterialType == "urlType") {
-                materialObject["materialName"] = currMaterialName;
-                if (Array.isArray(urlArray)) {
-                    urlCounter++;
-                    materialObject["materialLink"] = urlArray[urlCounter-1];
+            if (currMaterialName != "") {
+                let currMaterialType = materialTypeArray[i];
+                if (currMaterialType == "uploadType") {
+                    toUploadCounter++;
+                    let file = filesArray[toUploadCounter-1];
+                    promiseArray.push(uploadToS3({materialName: currMaterialName, file: file, folderName: folderName}));
                 }
-                else {
-                    materialObject["materialLink"] = urlArray;
+                else if (currMaterialType == "urlType") {
+                    materialObject["materialName"] = currMaterialName;
+                    if (Array.isArray(urlArray)) {
+                        urlCounter++;
+                        materialObject["materialLink"] = urlArray[urlCounter-1];
+                    }
+                    else {
+                        materialObject["materialLink"] = urlArray;
+                    }
+                    materialObject['type'] = 'urlType';
+                    sectionMaterial.push(materialObject);
                 }
-                materialObject['type'] = 'urlType';
-                sectionMaterial.push(materialObject);
             }
         }
         Promise.all(promiseArray)
@@ -53,8 +59,12 @@ const uploadController = (req) =>
                 materialObject['materialType'] = "uploadType"
                 sectionMaterial.push(materialObject);
             }
+            //array of objects
             resolve(sectionMaterial);
 
+        })
+        .catch(function(error) {
+            throw error;
         })
     })
 
