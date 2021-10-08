@@ -6,6 +6,10 @@ const config = require('./config');
 // set up our express app
 const app = express();
 
+app.get("/", function (req, res) {
+  return res.send("Hello! You need to add '/api' in your route for our endpoints!");
+});
+
 // set up swagger-ui
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require("swagger-jsdoc");
@@ -69,3 +73,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, function(){
     console.log(`🚀 Server ready at http://localhost:${PORT}`);
 });
+
+module.exports = app;

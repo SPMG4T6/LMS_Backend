@@ -10,10 +10,13 @@
     "swagger-ui-express": "^4.1.6"
   },
   "devDependencies": {
-    "nodemon": "^2.0.12"
+    "mocha": "^9.1.2",
+    "nodemon": "^2.0.12",
+    "supertest": "^6.1.6"
   },
   "scripts": {
-    "test": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "mocha ./test/* --exit"
   }
 }
