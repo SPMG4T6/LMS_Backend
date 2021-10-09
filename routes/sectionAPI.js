@@ -3,8 +3,6 @@ const router = express.Router();
 const Section = require('../models/section');
 const multer = require("multer");
 const uploadController = require('./uploadController');
-const section = require('../models/section');
-
 
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -119,18 +117,18 @@ router.get('/sections/:courseCode/:className/:sectionName', function(req, res, n
  *        description: A successful response
  */
 // Returning the specific document hyperlink
-// router.get('/section/material/:courseCode/:className/:sectionName/:materialName', async function(req,res,next) {
-//   const doc = await Section.findOne({courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName})
+router.get('/section/material/:courseCode/:className/:sectionName/:materialName', async function(req,res,next) {
+  const doc = await Section.findOne({courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName})
   
-//   if (doc === null) res.status(404).json({ error: "Section do not " + req.params.materialName });
+  if (doc === null) res.status(404).json({ error: "Section do not " + req.params.materialName });
 
-//   const material = req.params.materialName;
-//   for (let i = 0; i < doc.sectionMaterial.length; i++) {
-//     if (doc.sectionMaterial[i].materialName = material) {
-//       res.send(doc.sectionMaterial[i].materialLink)
-//     }
-//   }
-// });
+  const material = req.params.materialName;
+  for (let i = 0; i < doc.sectionMaterial.length; i++) {
+    if (doc.sectionMaterial[i].materialName = material) {
+      res.send(doc.sectionMaterial[i].materialLink)
+    }
+  }
+});
 
 /**
  * @swagger
@@ -200,7 +198,7 @@ router.post('/section',upload.array("myFile"), (req, res) => {
   uploadController(req)
   .then((response) => {
     const sectionMaterial = response;
-    console.log(sectionMaterial);
+
     delete req.body.materialName;
     delete req.body.materialType;
     delete req.body.myURL;
@@ -297,7 +295,7 @@ router.put('/section/quiz/:courseCode/:className/:sectionName', async function(r
  * /section/updateMaterials/{courseCode}/{className}/{sectionName}:
  *  put:
  *    summary: Update section materials for a specific section
- *    description: Updates the section materials by replacing the database section materials with the request body
+ *    description: Updates the section materials by replacing the database section materials with the request body. New materials need to be submitted using a form.
  *    tags: [section]
  *    parameters:
  *        - in: path
