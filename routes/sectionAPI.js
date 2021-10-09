@@ -123,7 +123,7 @@ router.get('/sections/:courseCode/:className/:sectionName', function(req, res, n
  *                      type: string
  *                      pattern: (https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})
  *                      example: www.google.com
- *                    type:
+ *                    materialType:
  *                      type: string
  *                      enum:
  *                      - urlType
