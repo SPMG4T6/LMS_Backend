@@ -293,7 +293,7 @@ router.put('/section/quiz/:courseCode/:className/:sectionName', async function(r
 /**
  * @swagger
  * /section/updateMaterials/{courseCode}/{className}/{sectionName}:
- *  post:
+ *  put:
  *    summary: Update section materials for a specific section
  *    description: Updates the section materials by replacing the database section materials with the request body. New materials need to be submitted using a form.
  *    tags: [section]
@@ -355,8 +355,8 @@ router.put('/section/quiz/:courseCode/:className/:sectionName', async function(r
 // Update section materials for a specific section
 router.post('/section/updateMaterials/:courseCode/:className/:sectionName', upload.array("myFile"), (req, res) => {
   
-  // const sectionName = req.params.sectionName.replace("+", " ");
-  Section.find({courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName})
+  const sectionName = req.params.sectionName.replace("+", " ");
+  Section.find({courseCode: req.params.courseCode, className: req.params.className, sectionName: sectionName})
   .then(function(section) {
     let retrievedSectionMaterialArray = section[0].sectionMaterial;
     let retrievedMaterialNameArray = [];
@@ -375,7 +375,7 @@ router.post('/section/updateMaterials/:courseCode/:className/:sectionName', uplo
         }
       });
 
-      Section.findOneAndUpdate({courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName}, {sectionMaterial: retrievedSectionMaterialArray}, {new: true}, (err, doc) => {
+      Section.findOneAndUpdate({courseCode: req.params.courseCode, className: req.params.className, sectionName: sectionName}, {sectionMaterial: retrievedSectionMaterialArray}, {new: true}, (err, doc) => {
         if (err) {
           res.status(404).json({ error: "Section not found" }) 
         };
