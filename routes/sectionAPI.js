@@ -4,7 +4,6 @@ const Section = require('../models/section');
 const multer = require("multer");
 const uploadController = require('./uploadController');
 
-
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
       cb(null, "public/files");
@@ -79,6 +78,60 @@ router.get('/sections/:courseCode/:className/:sectionName', function(req, res, n
 
 /**
  * @swagger
+ * /section/material/{courseCode}/{className}/{sectionName}/{materialName}:
+ *  get:
+ *    summary: Get section material's link
+ *    description: Retrieve the material link
+ *    tags: [section]
+ *    parameters:
+ *        - in: path
+ *          name: courseCode
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: Course Code
+ *          example: Programming for Xerox WorkCentre with Card Access and Integration
+ *        - in: path
+ *          name: className
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: Class Name
+ *          example: G14
+ *        - in: path
+ *          name: sectionName 
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: Section Name
+ *          example: Regression
+ *        - in: path
+ *          name: materialName
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: Name of the Material
+ *          example: Regression Notes
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
+// Returning the specific document hyperlink
+router.get('/section/material/:courseCode/:className/:sectionName/:materialName', async function(req,res,next) {
+  const doc = await Section.findOne({courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName})
+  
+  if (doc === null) res.status(404).json({ error: "Section do not " + req.params.materialName });
+
+  const material = req.params.materialName;
+  for (let i = 0; i < doc.sectionMaterial.length; i++) {
+    if (doc.sectionMaterial[i].materialName = material) {
+      res.send(doc.sectionMaterial[i].materialLink)
+    }
+  }
+});
+
+/**
+ * @swagger
  * /section:
  *  post:
  *    summary: Create a section
@@ -145,6 +198,7 @@ router.post('/section',upload.array("myFile"), (req, res) => {
   uploadController(req)
   .then((response) => {
     const sectionMaterial = response;
+
     delete req.body.materialName;
     delete req.body.materialType;
     delete req.body.myURL;
@@ -155,6 +209,9 @@ router.post('/section',upload.array("myFile"), (req, res) => {
       console.log("section created");
       res.send(section);
     }) 
+    .catch(function(error) {
+      console.log(error);
+    })
   }) 
 });
 
@@ -173,7 +230,7 @@ router.post('/section',upload.array("myFile"), (req, res) => {
  *            type: string
  *          required: true
  *          description: Course Code
- *          example: Programming for Xerox WorkCentre with Card Access and Integration
+ *          example: IS442
  *        - in: path
  *          name: className
  *          schema:
@@ -235,10 +292,10 @@ router.put('/section/quiz/:courseCode/:className/:sectionName', async function(r
 
 /**
  * @swagger
- * /section/material/{courseCode}/{className}/{sectionName}/{materialName}:
- *  get:
- *    summary: Get section material's link
- *    description: Retrieve the material link
+ * /section/updateMaterials/{courseCode}/{className}/{sectionName}:
+ *  put:
+ *    summary: Update section materials for a specific section
+ *    description: Updates the section materials by replacing the database section materials with the request body. New materials need to be submitted using a form.
  *    tags: [section]
  *    parameters:
  *        - in: path
@@ -247,7 +304,7 @@ router.put('/section/quiz/:courseCode/:className/:sectionName', async function(r
  *            type: string
  *          required: true
  *          description: Course Code
- *          example: Programming for Xerox WorkCentre with Card Access and Integration
+ *          example: IS442
  *        - in: path
  *          name: className
  *          schema:
@@ -261,30 +318,77 @@ router.put('/section/quiz/:courseCode/:className/:sectionName', async function(r
  *            type: string
  *          required: true
  *          description: Section Name
- *          example: Regression
- *        - in: path
- *          name: materialName
+ *          example: Artificial+Intelligence
+ *    requestBody:
+ *      required: true
+ *      content: 
+ *        application/json:
  *          schema:
- *            type: string
- *          required: true
- *          description: Name of the Material
- *          example: Regression Notes
+ *            type: object
+ *            properties:
+ *              sectionMaterial:
+ *                type: array
+ *                items:
+ *                  type: object
+ *                  properties:
+ *                    materialName:
+ *                      type: string
+ *                    materialLink:
+ *                      type: string
+ *                      pattern: (https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})
+ *                      example: www.google.com
+ *                    type:
+ *                      type: string
+ *                      enum:
+ *                      - urlType
+ *                      - uploadType
+ *                      example: urlType
+  *            required:
+  *              - courseCode
+  *              - className
+  *              - sectionName
+  *              - sectionMaterial
  *    responses:
  *      '200':
  *        description: A successful response
  */
-// Returning the specific document hyperlink
-router.get('/section/material/:courseCode/:className/:sectionName/:materialName', async function(req,res,next) {
-  const doc = await Section.findOne({courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName})
+// Update section materials for a specific section
+router.post('/section/updateMaterials/:courseCode/:className/:sectionName', upload.array("myFile"), (req, res) => {
   
-  if (doc === null) res.status(404).json({ error: "Section do not " + req.params.materialName });
+  const sectionName = req.params.sectionName.replace("+", " ");
+  Section.find({courseCode: req.params.courseCode, className: req.params.className, sectionName: sectionName})
+  .then(function(section) {
+    let retrievedSectionMaterialArray = section[0].sectionMaterial;
+    let retrievedMaterialNameArray = [];
+    retrievedSectionMaterialArray.forEach(element => {
+      let retrievedMaterialName = element['materialName'];
+      retrievedMaterialNameArray.push(retrievedMaterialName);
+    });
+    
+    uploadController(req)
+    .then((response) => {
+      const sectionMaterial = response;
+      sectionMaterial.forEach(element => {
+        let materialName = element['materialName'];
+        if (!retrievedMaterialNameArray.includes(materialName)) {
+          retrievedSectionMaterialArray.push(element);
+        }
+      });
 
-  const material = req.params.materialName;
-  for (let i = 0; i < doc.sectionMaterial.length; i++) {
-    if (doc.sectionMaterial[i].materialName = material) {
-      res.send(doc.sectionMaterial[i].materialLink)
-    }
-  }
-});
+      Section.findOneAndUpdate({courseCode: req.params.courseCode, className: req.params.className, sectionName: sectionName}, {sectionMaterial: retrievedSectionMaterialArray}, {new: true}, (err, doc) => {
+        if (err) {
+          res.status(404).json({ error: "Section not found" }) 
+        };
+        console.log("no err")
+        res.send(doc);
+      })
+    })
+    .catch(function(reason) {
+      console.log(reason);
+    })
+
+  })
+})
+
 
 module.exports = router;

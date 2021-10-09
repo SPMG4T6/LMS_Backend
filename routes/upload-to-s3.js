@@ -11,7 +11,7 @@ AWS.config.update({
 const getParams = (file, contentType, folderName) => {
     return {
         Bucket: "spm-g4t6-is212",
-        Key: `${folderName}/`+file.originalname,
+        Key: `${folderName}/`+ file.originalname,
         Body: fs.createReadStream(file.path),
         ContentDisposition: 'inline; filename=' + file.originalname,
         ACL:'public-read',
@@ -44,7 +44,7 @@ const uploadToS3 = ({materialName, file, folderName}) =>
                 reject(err);
             }
             if (data) {
-                // fs.unlinkSync(file.path);
+                fs.unlinkSync(file.path);
                 let s3PubUrl = data.Location;
                 resolve({materialName, s3PubUrl});
             }
