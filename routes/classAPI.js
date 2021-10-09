@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const ClassModel = require('../models/class');
 const User = require('../models/user');
+const CourseModel = require('../models/course');
 
 /**
  * @swagger
@@ -185,7 +186,7 @@ router.put('/class/quiz', function(req,res,next){
  * /class/enrol/{userID}:
  *  put:
  *    summary: Assigning an engineer to a class
- *    description: Pushes the engineer into the enrolledStudents field
+ *    description: Pushes the engineer into the enrolledStudents field, addes the courseCode into the user's learningCourses array
  *    tags: [class]
  *    parameters:
  *        - in: path
@@ -194,7 +195,7 @@ router.put('/class/quiz', function(req,res,next){
  *            type: string
  *          required: true
  *          description: Learner's User ID
- *          example: IS442
+ *          example: 1
  *    requestBody:
  *      required: true
  *      content: 
@@ -222,17 +223,19 @@ router.put('/class/quiz', function(req,res,next){
  */
 // Assigning an engineer
 router.put('/class/enrol/:userID', async function(req,res,next){
-  
+  let enrolmentEligibility = true;
+  let courseDoc = await CourseModel.findOne({courseCode: req.body.courseCode});
+  const coursePreReqArray = courseDoc['prereqCourses'];
+
   let user = await User.findOne({ userID: req.params.userID }).exec();
-
   if (user) {
-
     let learningCourses = user.learningCourses;
     let teachingCourses = user.teachingCourses;
     let completedCourses = user.completedCourses;
 
     // check if user is doing/did the course
     const courseCode = req.body.courseCode;
+
     if (learningCourses.includes(courseCode)) {
       res.status(404).json({ error: `${user.userID} is currently learning in ${courseCode}` })
     } else if (teachingCourses.includes(courseCode)) {
@@ -240,28 +243,52 @@ router.put('/class/enrol/:userID', async function(req,res,next){
     } else if (completedCourses.includes(courseCode)) {
       res.status(404).json({ error: `${user.userID} has completed ${courseCode}` })
     } else {
-      
       // user has no affiliation to this course
       let classDoc = await ClassModel.findOne({ courseCode: req.body.courseCode, className: req.body.className });
       if (classDoc) {
-          let enrolledStudents = classDoc.enrolledStudents;
-          if (enrolledStudents.includes(user.userID)) {
-            res.status(404).json({ error: `${user.userID} is currently in the course` })
-          } else {
+        let enrolledStudents = classDoc.enrolledStudents;
+        
+        // check if the class is full or not
+        if (enrolledStudents.length == classDoc.maxClassSize) {
+          res.status(500).json({error: `${classDoc.courseCode } ${classDoc.className} is fully enrolled!`})
+        }
+        else {
+          // check if user has completed pre-requisite courses 
+          coursePreReqArray.forEach(element => {
+            if (!completedCourses.includes(element)) {
+              enrolmentEligibility = false;
+              res.status(500).json({error: `${element} is needed as a pre-requisite course`})
+            }
+          });
+          // if class is not full and user has completed all the pre-requisite courses
+          if (enrolmentEligibility) {
             // Add the userID into the current enrolled list
             enrolledStudents.push(user.userID);
             ClassModel.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className }, { enrolledStudents: enrolledStudents }, { new: true }, (err, doc) => {
-              if (err) { res.status(404).json({ error: "Class not found" }) };
-              res.send(doc); // returns the update
+              if (err) { 
+                res.status(404).json({ error: "Class not found" }) 
+              };
+              console.log("Class enrolledStudents updated")
+              learningCourses.push(courseCode);
+
+              // add the courseCode to the learningCourses array of the user
+              User.findOneAndUpdate({userID: req.params.userID}, {learningCourses: learningCourses}, {new: true}, (err, doc) => {
+                if (err) {
+                  res.status(500).json({error: "Error updating User;"})
+                }
+                res.status(200).json({message: `User ${user.userID} successfully enrolled into ${courseCode} ${req.body.className}`});
+              })
             });
+
           }
-      } else { res.status(404).json({ error: "Class not found" }) }
-      
+        }
+      } 
+      else { 
+        res.status(404).json({ error: "Class not found" }) 
+      }
     }
-
-    
-
-  } else {
+  } 
+  else {
     res.status(404).json({ error: "User not found" })
   }
 })
