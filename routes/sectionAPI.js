@@ -176,7 +176,7 @@ router.get('/section/material/:courseCode/:className/:sectionName/:materialName'
  *                      type: string
  *                      pattern: (https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})
  *                      example: www.google.com
- *                    type:
+ *                    materialType:
  *                      type: string
  *                      enum:
  *                      - urlType
@@ -359,6 +359,8 @@ router.post('/section/updateMaterials/:courseCode/:className/:sectionName', uplo
   Section.find({courseCode: req.params.courseCode, className: req.params.className, sectionName: sectionName})
   .then(function(section) {
     let retrievedSectionMaterialArray = section[0].sectionMaterial;
+    // console.log("retrievedSectionMaterialArray");
+    // console.log(retrievedSectionMaterialArray);
     let retrievedMaterialNameArray = [];
     retrievedSectionMaterialArray.forEach(element => {
       let retrievedMaterialName = element['materialName'];
@@ -368,12 +370,22 @@ router.post('/section/updateMaterials/:courseCode/:className/:sectionName', uplo
     uploadController(req)
     .then((response) => {
       const sectionMaterial = response;
+      // console.log(sectionMaterial);
       sectionMaterial.forEach(element => {
         let materialName = element['materialName'];
         if (!retrievedMaterialNameArray.includes(materialName)) {
           retrievedSectionMaterialArray.push(element);
         }
+        else {
+          let obj = retrievedSectionMaterialArray.find((o,i) => {
+            if (o.materialName == materialName) {
+              retrievedSectionMaterialArray[i] = element;
+            }
+          })
+        }
       });
+      // console.log("Final sectionMaterial to be updated");
+      // console.log(retrievedSectionMaterialArray);
 
       Section.findOneAndUpdate({courseCode: req.params.courseCode, className: req.params.className, sectionName: sectionName}, {sectionMaterial: retrievedSectionMaterialArray}, {new: true}, (err, doc) => {
         if (err) {
