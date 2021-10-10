@@ -5,7 +5,8 @@ const uploadController = (req) =>
         if (Object.keys(req.body).length === 0 && req.body.constructor === Object) {
             reject("No body is attached");
         }
-
+        // console.log(req);
+        // console.log(req.files);
         let sectionMaterial = [];
         let promiseArray = [];
         let toUploadCounter = 0;
@@ -18,12 +19,14 @@ const uploadController = (req) =>
 
         // array of the material name, matches filesArray by index
         const materialNameArray = req.body.materialName;
+        // console.log(materialNameArray);
 
         // array of material type to track the index
         const materialTypeArray = req.body.materialType;
 
         // array of url types
         const urlArray = req.body.myURL;
+        // console.log(urlArray);
 
         for (var i = 0; i < req.body.materialName.length; i++) {
             let materialObject = {};
@@ -38,8 +41,10 @@ const uploadController = (req) =>
                 else if (currMaterialType == "urlType") {
                     materialObject["materialName"] = currMaterialName;
                     if (Array.isArray(urlArray)) {
+                        const filtered = urlArray.filter(element => element !== "");
+                        // console.log(filtered);
                         urlCounter++;
-                        materialObject["materialLink"] = urlArray[urlCounter-1];
+                        materialObject["materialLink"] = filtered[urlCounter-1];
                     }
                     else {
                         materialObject["materialLink"] = urlArray;

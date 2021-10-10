@@ -16,7 +16,8 @@
 <body>
     <main class="admin">
         <div class="admin__upload-file" style="width: 80%">
-            <form action="https://lmsbackendapi.herokuapp.com/api/section/updateMaterials/IS442/G14/Artificial+Intelligence" enctype="multipart/form-data" method="post"
+            <!-- <form action="https://localhost:5000/api/section/updateMaterials/IS442/G14/Artificial+Intelligence" enctype="multipart/form-data" method="post" -->
+            <form action="http://localhost:5000/api/section/updateMaterials/IS442/G14/Artificial+Intelligence" enctype="multipart/form-data" method="post"
                 style="display: flex; flex-direction: column;">
                 <div>
                     <span>Material name</span>
@@ -26,6 +27,7 @@
                         <option value='urlType'>URL</option>
                         <option value='uploadType'>File Upload</option>
                     </select>
+                    <input type='text' name='myURL'>
                     <input type="file" class="admin__input" name="myFile" />
                 </div>
                 <div>
@@ -47,14 +49,26 @@
                         <option value='urlType'>URL</option>
                         <option value='uploadType'>File Upload</option>
                     </select>
+                    <input type='text' name='myURL'>
+                    <input type="file" class="admin__input" name="myFile" />
+                </div>
+                <div>
+                    <span>Material name</span>
+                    <input type='text' class='admin__input' name='materialName'>
+                    <span>Select type: </span>
+                    <select name='materialType'>
+                        <option value='urlType'>URL</option>
+                        <option value='uploadType'>File Upload</option>
+                    </select>
+                    <input type='text' name='myURL'>
                     <input type="file" class="admin__input" name="myFile" />
                 </div>
                 <input class="admin__submit" type="submit" style="width: 100px;" />
                 <!-- <button class='submitButton'>Submit</button> -->
                 <input type="hidden" name="courseCode" value="IS442">
-                <input type="hidden" name="className" value="G14">
-                <input type="hidden" name="sectionName" value="Machine Learning">
-                <input type="hidden" name="sectionSequence" value="2">
+                <input type="hidden" name="className" value="G15">
+                <input type="hidden" name="sectionName" value="Artificial Intelligence">
+                <input type="hidden" name="sectionSequence" value="1">
             </form>
         </div>
     </main>
