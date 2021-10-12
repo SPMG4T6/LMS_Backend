@@ -3,13 +3,13 @@ const Schema = mongoose.Schema;
 
 // create student schema & model
 const ClassAppliedSchema = new Schema({
+    courseCode: {
+        type: String,
+        required: [true, 'courseCode is required']
+    },
     className: {
         type: String,
         required: [true, 'className is required']
-    },
-    courseName: {
-        type: String,
-        required: [true, 'courseName is required']
     },
     userID: {
         type: String,

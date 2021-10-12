@@ -3,9 +3,9 @@ const Schema = mongoose.Schema;
 
 // create student schema & model
 const ProgressSchema = new Schema({
-    courseName: {
+    courseCode: {
         type: String,
-        required: [true, 'courseName is required']
+        required: [true, 'courseCode is required']
     },
     className: {
         type: String,
