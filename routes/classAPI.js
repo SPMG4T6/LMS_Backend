@@ -29,6 +29,13 @@ router.get('/classes',function(req,res,next) {
  *  get:
  *    summary: Get classes by courseCode
  *    tags: [class]
+ *    parameters:
+ *        - in: path
+ *          name: courseCode
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The course's code
  *    responses:
  *      '200':
  *        description: A successful response
