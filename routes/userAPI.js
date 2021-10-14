@@ -23,6 +23,31 @@ router.get('/users',function(req,res,next) {
 
 /**
  * @swagger
+ * /user/{userID}:
+ *  get:
+ *    summary: Get a specific user
+ *    tags: [user]
+ *    parameters:
+ *        - in: path
+ *          name: userID
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: A user's ID
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
+router.get('/user/:userID',function(req,res,next) {
+    User.find({ userID: req.params.userID})
+    .then(function(users){
+        res.send(users);
+    })
+    .catch(next);
+});
+
+/**
+ * @swagger
  * /user:
  *  post:
  *    summary: Create a user
@@ -129,7 +154,7 @@ router.post('/user',function(req,res,next){
  */
 // update a user in the database
 router.put('/user/:userID', function(req,res,next){
-    User.findOneAndUpdate({_id: req.params.userID},req.body, { new: true }, (err, doc) => {
+    User.findOneAndUpdate({ userID: req.params.userID},req.body, { new: true }, (err, doc) => {
         if (err) res.status(404).json({ error: "User not found" });
         res.send(doc);
     });
@@ -154,7 +179,7 @@ router.put('/user/:userID', function(req,res,next){
  */
 // delete a user from the database
 router.delete('/user/:userID',function(req,res,next){
-    User.findOneAndDelete({_id: req.params.userID})
+    User.findOneAndDelete({ userID: req.params.userID})
     .then(function(user){
         res.send(user);
     });
