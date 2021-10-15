@@ -78,7 +78,7 @@ router.get('/classes/view/:courseCode', function(req,res,next) {
 router.get('/class/view/:courseCode/:className', function(req,res,next) {
   ClassModel.find({"courseCode": req.params.courseCode, className: req.params.className})
   .then(function(classes) {
-    if (classes.length > 1) {
+    if (classes) {
       res.send(classes);
     }
     else {
@@ -88,6 +88,7 @@ router.get('/class/view/:courseCode/:className', function(req,res,next) {
         message: "Error! Class not found"
       }, 500)
     }
+    
   })
   .catch(error => console.log(error));
 });
