@@ -51,6 +51,49 @@ router.get('/classes/view/:courseCode', function(req,res,next) {
 
 /**
  * @swagger
+ * /class/view/{courseCode}/{className}:
+ *  get:
+ *    summary: Get class by courseCode and className
+ *    tags: [class]
+ *    parameters:
+ *        - in: path
+ *          name: courseCode
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The course's code
+ *          example: IS216
+ *        - in: path
+ *          name: className
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The class name
+ *          example: G1
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
+// get class details by courseCode and className
+router.get('/classes/view/:courseCode/:className', function(req,res,next) {
+  ClassModel.find({"courseCode": req.params.courseCode, className: req.params.className})
+  .then(function(classes) {
+    if (classes.length > 1) {
+      res.send(classes);
+    }
+    else {
+      res.send({
+        courseCode: req.params.courseCode,
+        className: req.params.className,
+        message: "Error! Class not found"
+      }, 500)
+    }
+  })
+  .catch(error => console.log(error));
+});
+
+/**
+ * @swagger
  * /class:
  *  post:
  *    summary: Create a class
