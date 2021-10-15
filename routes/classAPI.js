@@ -75,7 +75,7 @@ router.get('/classes/view/:courseCode', function(req,res,next) {
  *        description: A successful response
  */
 // get class details by courseCode and className
-router.get('/classes/view/:courseCode/:className', function(req,res,next) {
+router.get('/class/view/:courseCode/:className', function(req,res,next) {
   ClassModel.find({"courseCode": req.params.courseCode, className: req.params.className})
   .then(function(classes) {
     if (classes.length > 1) {
