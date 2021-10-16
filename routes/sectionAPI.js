@@ -292,8 +292,8 @@ router.put('/section/quiz/:courseCode/:className/:sectionName', async function(r
 
 /**
  * @swagger
- * /section/updateMaterials/:
- *  put:
+ * /section/updateMaterials:
+ *  post:
  *    summary: Update section materials for a specific section
  *    description: Updates the section materials by replacing the database section materials with the request body. New materials need to be submitted using a form.
  *    tags: [section]
