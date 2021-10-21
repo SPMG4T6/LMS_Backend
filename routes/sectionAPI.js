@@ -194,7 +194,7 @@ router.get('/section/material/:courseCode/:className/:sectionName/:materialName'
  *        description: A successful response
  */
 // add a new section of class to database
-router.post('/section',upload.array("myFile"), (req, res) => {
+router.post('/section', upload.array("myFile"), (req, res) => {
   uploadController(req)
   .then((response) => {
     const sectionMaterial = response;
