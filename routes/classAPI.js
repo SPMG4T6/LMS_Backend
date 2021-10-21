@@ -3,6 +3,7 @@ const router = express.Router();
 const ClassModel = require('../models/class');
 const User = require('../models/user');
 const CourseModel = require('../models/course');
+const courseEligibility = require("./courseEligibility");
 
 /**
  * @swagger
@@ -13,14 +14,27 @@ const CourseModel = require('../models/course');
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '500':
+ *        description: Failure to get list of classes
  */
 // get a list of classes from the database
 router.get('/classes',function(req,res,next) {
   ClassModel.find({})
-    .then(function(classes){
-        res.send(classes);
+    .then(response => {
+      if (response.length > 0) {
+        res.status(200).send(response);
+      }
+      else {
+        res.status(500).send({
+          message: "Unable to get list of classes"
+        })
+      }
     })
-    .catch(next);
+    .catch(response => {
+      res.status(500).send({
+        message: response
+      });
+    });
 });
 
 /**
@@ -36,18 +50,34 @@ router.get('/classes',function(req,res,next) {
  *            type: string
  *          required: true
  *          description: The course's code
+ *          example: IS216
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '500':
+ *        description: Failure to find classes with courseCode
  */
 // get class details by courseCode
 router.get('/classes/view/:courseCode', function(req,res,next) {
   ClassModel.find({"courseCode": req.params.courseCode})
-  .then(function(classes) {
-    res.send(classes);
+  .then(response => {
+    if (response.length > 0) {
+      res.status(200).send(response);
+    }
+    else {
+      res.status(500).send({
+        courseCode: req.params.courseCode,
+        message: "Unable to get class details"
+      })
+    }
   })
-  .catch(next);
+  .catch(response => {
+    res.status(500).send({
+      message: response
+    });
+  });
 });
+
 
 /**
  * @swagger
@@ -73,24 +103,88 @@ router.get('/classes/view/:courseCode', function(req,res,next) {
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '500':
+ *         description: Class not found
  */
 // get class details by courseCode and className
 router.get('/class/view/:courseCode/:className', function(req,res,next) {
-  ClassModel.find({"courseCode": req.params.courseCode, className: req.params.className})
-  .then(function(classes) {
-    if (classes) {
-      res.send(classes);
-    }
-    else {
-      res.send({
+  ClassModel.find({courseCode: req.params.courseCode, className: req.params.className})
+  .then(response => {
+    if (response.length > 0) {
+      res.status(200).send(response)
+    } else {
+      res.status(500).send({
         courseCode: req.params.courseCode,
         className: req.params.className,
-        message: "Error! Class not found"
-      }, 500)
+        message: "Error! Class not found!"
+      })
     }
-    
   })
-  .catch(error => console.log(error));
+  .catch(error => {
+    res.status(500).send({
+      message: error
+    });
+  });
+});
+
+/**
+ * @swagger
+ * /class/view/eligibleUsers/{courseCode}/{className}:
+ *  get:
+ *    summary: Get all users who are eligible to enrol in the class
+ *    tags: [class]
+ *    parameters:
+ *        - in: path
+ *          name: courseCode
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The course's code
+ *          example: IS216
+ *        - in: path
+ *          name: className
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The class name
+ *          example: G1
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
+// get all eligible users by courseCode and className
+router.get('/class/view/eligibleUsers/:courseCode/:className', async function(req,res,next) {
+  let courseDoc = await CourseModel.findOne({courseCode: req.params.courseCode})
+  let classDoc = await ClassModel.findOne({ courseCode: req.params.courseCode, className: req.params.className });
+  User.find({})
+  .then(response => {
+    let eligibleUsers = courseEligibility({courseDoc: courseDoc, userArray: response, classDoc: classDoc})
+    .then(response => {
+      if (response.length > 0) {
+        console.log(response);
+        res.send(response);
+      }
+      else {
+        res.status(500).send({
+          "status": "500",
+          "courseCode": req.params.courseCode,
+          "className": req.params.className,
+          "message": `No eligible learners available for this course`
+        })
+      }
+    })
+    .catch((message) => {
+      res.status(500).send({
+        message:message
+      });
+    });
+  })
+  .catch((message) => {
+    res.status(500).send({
+      message: message
+    })
+  })
+  
 });
 
 /**
@@ -167,14 +261,34 @@ router.get('/class/view/:courseCode/:className', function(req,res,next) {
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '500':
+ *         description: Class already exists
  */
 // add a new class to database
-router.post('/class',function(req,res,next){
-  ClassModel.create(req.body)
-    .then(function(c){
-        res.send(c);
+router.post('/class', async function(req,res,next){
+  let searchResult = await ClassModel.findOne({courseCode: req.body.courseCode, className: req.body.className});
+  if (!searchResult) {
+    ClassModel.create(req.body)
+      .then(response => {
+        // console.log(response);
+        res.status(200).send({
+          status: "200",
+          message: `${req.body.courseCode} ${req.body.className} class created`
+        });
+      })
+      .catch(response => {
+        res.status(500).send({
+          "message": "Unknown error occurred",
+          "data": response.json
+        })
+      });
+  }
+  else {
+    res.status(500).send({
+      "code": "500",
+      "message": `Class ${req.body.courseCode} ${req.body.className} already exists!`
     })
-    .catch(next);
+  }
 });
 
 /**
@@ -222,13 +336,12 @@ router.post('/class',function(req,res,next){
  */
 // Update a grade quiz for the class
 router.put('/class/quiz', function(req,res,next){
-
   let quizDetails = req.body.quizDetails;
-  console.log(req.body)
+  // console.log(req.body)
   // replaces the entire quiz details
   ClassModel.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className }, { quizDetails: quizDetails }, { new: true }, (err, doc) => {
     if (err) { res.status(404).json({ error: "Class not found" }) };
-    res.send(doc); // returns the update
+    res.status(200).send(doc); // returns the update
   });
 })
 
@@ -245,103 +358,37 @@ router.put('/class/quiz', function(req,res,next){
  *          schema:
  *            type: string
  *          required: true
- *          description: Learner's User ID
- *          example: 1
- *    requestBody:
- *      required: true
- *      content: 
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              courseCode:
- *                type: string
- *              className:
- *                type: string
- *              userType:
- *                type: string
- *                enum:
- *                - learner
- *                - trainer
- *                example: learner
- *            required:
- *              - courseCode
- *              - className
- *              - userType
+ *          description: The User ID
+ *          example: 0123456
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '500':
+ *        description: Error updating User
  */
 // Assigning an engineer
 router.put('/class/enrol/:userID', async function(req,res,next){
-  let enrolmentEligibility = true;
-  let courseDoc = await CourseModel.findOne({courseCode: req.body.courseCode});
-  const coursePreReqArray = courseDoc['prereqCourses'];
+  let classDoc = await ClassModel.findOne({ courseCode: req.body.courseCode, className: req.body.className });
+  let user = await User.findOne({UserID: req.params.userID}).exec();
+  let learningCourses = user.learningCourses;
+  let enrolledStudents = classDoc.enrolledStudents;
 
-  let user = await User.findOne({ userID: req.params.userID }).exec();
-  if (user) {
-    let learningCourses = user.learningCourses;
-    let teachingCourses = user.teachingCourses;
-    let completedCourses = user.completedCourses;
+  enrolledStudents.push(req.params.userID);
+  ClassModel.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className }, { enrolledStudents: enrolledStudents }, { new: true }, (err, doc) => {
+    if (err) { 
+      res.status(404).json({ error: "Class not found" }) 
+    };
+    console.log("Class enrolledStudents updated")
+    learningCourses.push(req.body.courseCode);
 
-    // check if user is doing/did the course
-    const courseCode = req.body.courseCode;
-
-    if (learningCourses.includes(courseCode)) {
-      res.status(404).json({ error: `${user.userID} is currently learning in ${courseCode}` })
-    } else if (teachingCourses.includes(courseCode)) {
-      res.status(404).json({ error: `${user.userID} is currently teaching in ${courseCode}` })
-    } else if (completedCourses.includes(courseCode)) {
-      res.status(404).json({ error: `${user.userID} has completed ${courseCode}` })
-    } else {
-      // user has no affiliation to this course
-      let classDoc = await ClassModel.findOne({ courseCode: req.body.courseCode, className: req.body.className });
-      if (classDoc) {
-        let enrolledStudents = classDoc.enrolledStudents;
-        
-        // check if the class is full or not
-        if (enrolledStudents.length == classDoc.maxClassSize) {
-          res.status(500).json({error: `${classDoc.courseCode } ${classDoc.className} is fully enrolled!`})
-        }
-        else {
-          // check if user has completed pre-requisite courses 
-          coursePreReqArray.forEach(element => {
-            if (!completedCourses.includes(element)) {
-              enrolmentEligibility = false;
-              res.status(500).json({error: `${element} is needed as a pre-requisite course`})
-            }
-          });
-          // if class is not full and user has completed all the pre-requisite courses
-          if (enrolmentEligibility) {
-            // Add the userID into the current enrolled list
-            enrolledStudents.push(user.userID);
-            ClassModel.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className }, { enrolledStudents: enrolledStudents }, { new: true }, (err, doc) => {
-              if (err) { 
-                res.status(404).json({ error: "Class not found" }) 
-              };
-              console.log("Class enrolledStudents updated")
-              learningCourses.push(courseCode);
-
-              // add the courseCode to the learningCourses array of the user
-              User.findOneAndUpdate({userID: req.params.userID}, {learningCourses: learningCourses}, {new: true}, (err, doc) => {
-                if (err) {
-                  res.status(500).json({error: "Error updating User;"})
-                }
-                res.status(200).json({message: `User ${user.userID} successfully enrolled into ${courseCode} ${req.body.className}`});
-              })
-            });
-
-          }
-        }
-      } 
-      else { 
-        res.status(404).json({ error: "Class not found" }) 
+    // add the courseCode to the learningCourses array of the user
+    User.findOneAndUpdate({userID: req.params.userID}, {learningCourses: learningCourses}, {new: true}, (err, doc) => {
+      if (err) {
+        res.status(500).json({error: "Error updating User;"})
       }
-    }
-  } 
-  else {
-    res.status(404).json({ error: "User not found" })
-  }
+      res.status(200).json({message: `User ${req.params.userID} successfully enrolled into ${req.body.courseCode} ${req.body.className}`});
+    })
+  });
 })
 
 module.exports = router;
