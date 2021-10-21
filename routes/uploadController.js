@@ -11,7 +11,7 @@ const uploadController = (req) =>
         let promiseArray = [];
         let toUploadCounter = 0;
         let urlCounter = 0;
-        let folderName = req.body.courseCode + "." + req.body.className
+        let folderName = req.body.courseCode + "." + req.body.className;
 
         // array of file objects
         const filesArray = req.files;
@@ -49,7 +49,7 @@ const uploadController = (req) =>
                     else {
                         materialObject["materialLink"] = urlArray;
                     }
-                    materialObject['type'] = 'urlType';
+                    materialObject['materialType'] = 'urlType';
                     sectionMaterial.push(materialObject);
                 }
             }

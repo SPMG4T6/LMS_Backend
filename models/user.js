@@ -12,10 +12,10 @@ const UserSchema = new Schema({
         type: String,
         required: [true, 'userName is required']
     },
-    // 'HR', 'Trainer' 'Engineer'
+    // 'Human Resource', 'Trainer' 'Learner'
     userType: {
         type: String,
-        default: 'Engineer'
+        default: 'Trainer'
     },
     learningCourses: {
         type: Array

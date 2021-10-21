@@ -194,7 +194,7 @@ router.get('/section/material/:courseCode/:className/:sectionName/:materialName'
  *        description: A successful response
  */
 // add a new section of class to database
-router.post('/section',upload.array("myFile"), (req, res) => {
+router.post('/section', upload.array("myFile"), (req, res) => {
   uploadController(req)
   .then((response) => {
     const sectionMaterial = response;
@@ -292,8 +292,8 @@ router.put('/section/quiz/:courseCode/:className/:sectionName', async function(r
 
 /**
  * @swagger
- * /section/updateMaterials/{courseCode}/{className}/{sectionName}:
- *  put:
+ * /section/updateMaterials:
+ *  post:
  *    summary: Update section materials for a specific section
  *    description: Updates the section materials by replacing the database section materials with the request body. New materials need to be submitted using a form.
  *    tags: [section]
