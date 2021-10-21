@@ -16,7 +16,7 @@ const User = require('../models/user');
 router.get('/users',function(req,res,next) {
     User.find({})
     .then(function(users){
-        res.send(users);
+        res.status(200).send(users);
     })
     .catch(next);
 });
@@ -37,13 +37,21 @@ router.get('/users',function(req,res,next) {
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '404':
+ *        description: Error message stating: "No user with specified userID was found"
  */
 router.get('/user/:userID',function(req,res,next) {
     User.find({ userID: req.params.userID})
     .then(function(users){
-        res.send(users);
+        if (users.length > 0) {
+            res.status(200).send(users);
+        } else {
+            res.status(404).send({"message": "No user with specified userID was found"})
+        }
     })
-    .catch(next);
+    .catch(res => {
+        res.status(500).send({"message": "MongoDB died"})
+    }) ;
 });
 
 /**
@@ -95,7 +103,7 @@ router.get('/user/:userID',function(req,res,next) {
 router.post('/user',function(req,res,next){
     User.create(req.body)
     .then(function(user){
-        res.send(user);
+        res.status(200).send(user);
     })
     .catch(next);
 });

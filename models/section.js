@@ -15,7 +15,7 @@ const SectionSchema = new Schema({
         type: String,
         required: [true, 'sectionName is required']
     },
-    sectionSequence: {
+    sectionSequence: {  
         type: Number,
         required: [true, 'sectionSequence is required']
     },

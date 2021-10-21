@@ -1,0 +1,1 @@
+module.exports.User = {"WO DE MAMA": "MEI YOU MAO"}
