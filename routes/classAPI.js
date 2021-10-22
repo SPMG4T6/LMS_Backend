@@ -4,6 +4,7 @@ const ClassModel = require('../models/class');
 const User = require('../models/user');
 const CourseModel = require('../models/course');
 const courseEligibility = require("./courseEligibility");
+const retrieveEnrolled = require('./retrieveEnrolled');
 
 /**
  * @swagger
@@ -161,7 +162,7 @@ router.get('/class/view/eligibleUsers/:courseCode/:className', async function(re
     let eligibleUsers = courseEligibility({courseDoc: courseDoc, userArray: response, classDoc: classDoc})
     .then(response => {
       if (response.length > 0) {
-        console.log(response);
+        // console.log(response);
         res.send(response);
       }
       else {
@@ -184,7 +185,61 @@ router.get('/class/view/eligibleUsers/:courseCode/:className', async function(re
       message: message
     })
   })
-  
+
+});
+
+/**
+ * @swagger
+ * /class/view/enrolledUsers/{courseCode}/{className}:
+ *  get:
+ *    summary: Get all users who are enrolled in the class
+ *    tags: [class]
+ *    parameters:
+ *        - in: path
+ *          name: courseCode
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The course's code
+ *          example: IS216
+ *        - in: path
+ *          name: className
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The class name
+ *          example: G1
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ *      '500':
+ *        description: Error
+ */
+// get all enrolled users by courseCode and className
+router.get('/class/view/enrolledUsers/:courseCode/:className', async function(req,res) {
+  let promiseArray = [];
+  let classDoc = await ClassModel.findOne({ courseCode: req.params.courseCode, className: req.params.className });
+  if (classDoc) {
+    // enrolledStudents is an array of userIDs
+    let enrolledStudents = classDoc.enrolledStudents;
+    // console.log(enrolledStudents);
+    enrolledStudents.forEach(element => {
+      promiseArray.push(retrieveEnrolled(element));
+    });
+    Promise.all(promiseArray)
+    .then(response => {
+      //response is an array of user objects
+      res.status(200).send(response);
+    })
+    .catch(error => {
+      res.status(500).send(error);
+    })
+  }
+  else {
+    res.status(404).send({
+      message: "Unable to find class"
+    })
+  }
 });
 
 /**
