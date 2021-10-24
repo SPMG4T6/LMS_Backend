@@ -11,14 +11,18 @@ const User = require('../models/user');
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '500':
+ *        description: Server error
  */
 // get a list of all users from the database
-router.get('/users',function(req,res,next) {
+router.get('/users', function (req, res, next) {
     User.find({})
-    .then(function(users){
-        res.status(200).send(users);
-    })
-    .catch(next);
+        .then(function (users) {
+            res.status(200).send(users);
+        })
+        .catch(res => {
+            res.status(500).send({ "message": "Server error" })
+        });
 });
 
 /**
@@ -38,20 +42,22 @@ router.get('/users',function(req,res,next) {
  *      '200':
  *        description: A successful response
  *      '404':
- *        description: Error message stating: "No user with specified userID was found"
+ *        description: No user with specified userID was found
+ *      '500':
+ *        description: Server error
  */
-router.get('/user/:userID',function(req,res,next) {
-    User.find({ userID: req.params.userID})
-    .then(function(users){
-        if (users.length > 0) {
-            res.status(200).send(users);
-        } else {
-            res.status(404).send({"message": "No user with specified userID was found"})
-        }
-    })
-    .catch(res => {
-        res.status(500).send({"message": "MongoDB died"})
-    }) ;
+router.get('/user/:userID', function (req, res, next) {
+    User.find({ userID: req.params.userID })
+        .then(function (users) {
+            if (users.length > 0) {
+                res.status(200).send(users);
+            } else {
+                res.status(404).send({ "message": "No user with specified userID was found" })
+            }
+        })
+        .catch(res => {
+            res.status(500).send({ "message": "Server error" })
+        });
 });
 
 /**
@@ -96,16 +102,27 @@ router.get('/user/:userID',function(req,res,next) {
  *            - involvedCourses
  *            - completedCourses
  *    responses:
- *      '200':
+ *      '201':
  *        description: A successful response
+ *      '400':
+ *        description: Failed to add, userID already exists
+ *      '500':
+ *        description: Server error
  */
 // add a new user to database
-router.post('/user',function(req,res,next){
-    User.create(req.body)
-    .then(function(user){
-        res.status(200).send(user);
-    })
-    .catch(next);
+router.post('/user', async function (req, res, next) {
+    let searchResult = await User.findOne({ userID: req.body.userID })
+    if (!searchResult) {
+        User.create(req.body)
+            .then(function (user) {
+                res.status(200).send(user);
+            })
+            .catch(res => {
+                res.status(500).send({ "message": "Server error" })
+            });
+    } else {
+        res.status(400).send({ "message": "UserID already exists!" })
+    }
 });
 
 /**
@@ -159,12 +176,20 @@ router.post('/user',function(req,res,next){
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '404':
+ *        description: User not found
+ *      '500':
+ *        description: Server error
  */
 // update a user in the database
-router.put('/user/:userID', function(req,res,next){
-    User.findOneAndUpdate({ userID: req.params.userID},req.body, { new: true }, (err, doc) => {
-        if (err) res.status(404).json({ error: "User not found" });
-        res.send(doc);
+router.put('/user/:userID', function (req, res, next) {
+    User.findOneAndUpdate({ userID: req.params.userID }, req.body, { new: true }, (err, doc) => {
+        if (err) res.status(500).send({ "message": "Server error" });
+        if (doc !== null) {
+            res.status(200).send(doc);
+        } else {
+            res.status(404).send( {"message": "User not found"} )
+        }
     });
 });
 
@@ -184,13 +209,24 @@ router.put('/user/:userID', function(req,res,next){
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '404':
+ *        description: Specified userID not found, not deleted
+ *      '500':
+ *        description: Server error
  */
 // delete a user from the database
-router.delete('/user/:userID',function(req,res,next){
-    User.findOneAndDelete({ userID: req.params.userID})
-    .then(function(user){
-        res.send(user);
-    });
+router.delete('/user/:userID', function (req, res, next) {
+    User.findOneAndDelete({ userID: req.params.userID })
+        .then(function (user) {
+            if (user !== null) {
+                res.status(200).send(user);
+            } else {
+                res.status(404).send({ "message": "No user with specified userID was found" });
+            }
+        })
+        .catch(res => {
+            res.status(500).send({ "message": "Server error" })
+        });
 });
 
 module.exports = router;
