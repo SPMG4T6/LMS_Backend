@@ -15,8 +15,10 @@ const retrieveEnrolled = require('./retrieveEnrolled');
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '404':
+ *        description: No classes exist
  *      '500':
- *        description: Failure to get list of classes
+ *        description: Server error
  */
 // get a list of classes from the database
 router.get('/classes',function(req,res,next) {
@@ -26,15 +28,11 @@ router.get('/classes',function(req,res,next) {
         res.status(200).send(response);
       }
       else {
-        res.status(500).send({
-          message: "Unable to get list of classes"
-        })
+        res.status(400).send({ message: "No classes exist" })
       }
     })
-    .catch(response => {
-      res.status(500).send({
-        message: response
-      });
+    .catch(error => {
+      res.status(500).send({ message: "Server error" });
     });
 });
 
@@ -55,8 +53,10 @@ router.get('/classes',function(req,res,next) {
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '404':
+ *        description: Class with (courseCode) do not exist
  *      '500':
- *        description: Failure to find classes with courseCode
+ *        description: Server error
  */
 // get class details by courseCode
 router.get('/classes/view/:courseCode', function(req,res,next) {
@@ -66,16 +66,11 @@ router.get('/classes/view/:courseCode', function(req,res,next) {
       res.status(200).send(response);
     }
     else {
-      res.status(500).send({
-        courseCode: req.params.courseCode,
-        message: "Unable to get class details"
-      })
+      res.status(404).send({ message: "Class with " + req.params.courseCode + " do not exist" })
     }
   })
-  .catch(response => {
-    res.status(500).send({
-      message: response
-    });
+  .catch(error => {
+    res.status(500).send({ message: "Server error" });
   });
 });
 
@@ -104,8 +99,10 @@ router.get('/classes/view/:courseCode', function(req,res,next) {
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '404':
+ *        description: Error! Class not found!
  *      '500':
- *         description: Class not found
+ *         description: Server error
  */
 // get class details by courseCode and className
 router.get('/class/view/:courseCode/:className', function(req,res,next) {
@@ -114,17 +111,11 @@ router.get('/class/view/:courseCode/:className', function(req,res,next) {
     if (response.length > 0) {
       res.status(200).send(response)
     } else {
-      res.status(500).send({
-        courseCode: req.params.courseCode,
-        className: req.params.className,
-        message: "Error! Class not found!"
-      })
+      res.status(404).send({ message: "Error! Class not found!" })
     }
   })
   .catch(error => {
-    res.status(500).send({
-      message: error
-    });
+    res.status(500).send({ message: "Server error" });
   });
 });
 
@@ -152,6 +143,10 @@ router.get('/class/view/:courseCode/:className', function(req,res,next) {
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '404':
+ *        description: No eligible learners available for this course
+ *      '500':
+ *        description: Server error
  */
 // get all eligible users by courseCode and className
 router.get('/class/view/eligibleUsers/:courseCode/:className', async function(req,res,next) {
@@ -166,24 +161,15 @@ router.get('/class/view/eligibleUsers/:courseCode/:className', async function(re
         res.send(response);
       }
       else {
-        res.status(500).send({
-          "status": "500",
-          "courseCode": req.params.courseCode,
-          "className": req.params.className,
-          "message": `No eligible learners available for this course`
-        })
+        res.status(404).send({ message: `No eligible learners available for this course` })
       }
     })
-    .catch((message) => {
-      res.status(500).send({
-        message:message
-      });
+    .catch((err) => {
+      res.status(500).send({ message: "Server error" });
     });
   })
-  .catch((message) => {
-    res.status(500).send({
-      message: message
-    })
+  .catch((err) => {
+    res.status(500).send({ message: "Server error" })
   })
 
 });
@@ -212,8 +198,10 @@ router.get('/class/view/eligibleUsers/:courseCode/:className', async function(re
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '404':
+ *        description: Unable to find class
  *      '500':
- *        description: Error
+ *        description: Server error
  */
 // get all enrolled users by courseCode and className
 router.get('/class/view/enrolledUsers/:courseCode/:className', async function(req,res) {
@@ -232,13 +220,11 @@ router.get('/class/view/enrolledUsers/:courseCode/:className', async function(re
       res.status(200).send(response);
     })
     .catch(error => {
-      res.status(500).send(error);
+      res.status(500).send({ message: "Server error" });
     })
   }
   else {
-    res.status(404).send({
-      message: "Unable to find class"
-    })
+    res.status(404).send({ message: "Unable to find class" })
   }
 });
 
@@ -316,8 +302,10 @@ router.get('/class/view/enrolledUsers/:courseCode/:className', async function(re
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '400':
+ *        description: Class already exists
  *      '500':
- *         description: Class already exists
+ *        description: Server error
  */
 // add a new class to database
 router.post('/class', async function(req,res,next){
@@ -326,23 +314,14 @@ router.post('/class', async function(req,res,next){
     ClassModel.create(req.body)
       .then(response => {
         // console.log(response);
-        res.status(200).send({
-          status: "200",
-          message: `${req.body.courseCode} ${req.body.className} class created`
-        });
+        res.status(200).send(response);
       })
-      .catch(response => {
-        res.status(500).send({
-          "message": "Unknown error occurred",
-          "data": response.json
-        })
+      .catch(res => {
+        res.status(500).send({ message: "Server error" })
       });
   }
   else {
-    res.status(500).send({
-      "code": "500",
-      "message": `Class ${req.body.courseCode} ${req.body.className} already exists!`
-    })
+    res.status(400).send({ message: `Class ${req.body.courseCode} ${req.body.className} already exists!` })
   }
 });
 
@@ -388,6 +367,10 @@ router.post('/class', async function(req,res,next){
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '404':
+ *        description: Class XXX (className) do not exist
+ *      '500':
+ *        description: Server error.
  */
 // Update a grade quiz for the class
 router.put('/class/quiz', function(req,res,next){
@@ -395,9 +378,10 @@ router.put('/class/quiz', function(req,res,next){
   // console.log(req.body)
   // replaces the entire quiz details
   ClassModel.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className }, { quizDetails: quizDetails }, { new: true }, (err, doc) => {
-    if (err) { res.status(404).json({ error: "Class not found" }) };
-    res.status(200).send(doc); // returns the update
-  });
+    if (err) { res.status(500).send({ message: "Server error" }) };
+    if (doc) { res.status(200).send(doc); } // returns the update
+    else { res.status(404).send({ message: "Class " + req.body.className + " do not exist" }) }
+  })
 })
 
 /**
@@ -415,35 +399,106 @@ router.put('/class/quiz', function(req,res,next){
  *          required: true
  *          description: The User ID
  *          example: 0123456
+ *    requestBody:
+ *      required: true
+ *      content: 
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              courseCode:
+ *                type: string
+ *              className:
+ *                type: string
+ *            required:
+ *              - courseCode
+ *              - className
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '404':
+ *        description: Class or User not found
  *      '500':
- *        description: Error updating User
+ *        description: Server error
  */
 // Assigning an engineer
 router.put('/class/enrol/:userID', async function(req,res,next){
   let classDoc = await ClassModel.findOne({ courseCode: req.body.courseCode, className: req.body.className });
   let user = await User.findOne({UserID: req.params.userID}).exec();
   let learningCourses = user.learningCourses;
-  let enrolledStudents = classDoc.enrolledStudents;
 
-  enrolledStudents.push(req.params.userID);
-  ClassModel.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className }, { enrolledStudents: enrolledStudents }, { new: true }, (err, doc) => {
-    if (err) { 
-      res.status(404).json({ error: "Class not found" }) 
-    };
-    console.log("Class enrolledStudents updated")
-    learningCourses.push(req.body.courseCode);
+  if (classDoc) {
+    if (user) {
+      let enrolledStudents = classDoc.enrolledStudents;
 
-    // add the courseCode to the learningCourses array of the user
-    User.findOneAndUpdate({userID: req.params.userID}, {learningCourses: learningCourses}, {new: true}, (err, doc) => {
-      if (err) {
-        res.status(500).json({error: "Error updating User;"})
-      }
-      res.status(200).json({message: `User ${req.params.userID} successfully enrolled into ${req.body.courseCode} ${req.body.className}`});
-    })
-  });
+      enrolledStudents.push(req.params.userID);
+    
+      ClassModel.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className }, { enrolledStudents: enrolledStudents }, { new: true }, (err, doc) => {
+        if (err) { 
+          // res.status(404).send("Class " + req.body.className + " not found") 
+          res.status(500).send({ message: "Server error" })
+        }
+        else if (doc) {
+          // console.log("Class enrolledStudents updated")
+          learningCourses.push(req.body.courseCode);
+    
+          // add the courseCode to the learningCourses array of the user
+          User.findOneAndUpdate({userID: req.params.userID}, {learningCourses: learningCourses}, {new: true}, (userErr, userDoc) => {
+            if (userErr) {
+              // res.status(404).send("User " + req.params.userID + " do not exist")
+              res.status(500).send({ message: "Server error" })
+            }
+            else if (userDoc) { 
+              res.status(200).send(userDoc);
+            } else { res.status(404).send({ message: "User " + req.params.userID + " do not exist" }) }
+          })
+        } else { res.status(404).send({ message: "Class " + req.body.className + " not found" }) }
+      });
+    } else { res.status(404).send({ message: "User " + req.params.userID + " do not exist." }) }
+  } else { res.status(404).send({ message: "Class (" + req.body.courseCode + "), " + req.body.className + " do not exist." }) }
+  
 })
+
+/**
+ * @swagger
+ * /class/{courseCode}/{className}:
+ *  delete:
+ *    summary: Delete a specific class
+ *    tags: [class]
+ *    parameters:
+ *        - in: path
+ *          name: courseCode
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The class courseCode
+ *        - in: path
+ *          name: className
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: Name of the class
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ *      '404':
+ *        description: Class XXX(className) do not exist
+ *      '500':
+ *        description: Server error
+ */
+// delete a user from the database
+router.delete('/class/:courseCode/:className',function(req,res,next){
+  ClassModel.findOneAndDelete({ courseCode: req.params.courseCode, className: req.params.className })
+  .exec()
+  .then(function(c){
+    if (c !== null) {
+      res.status(200).send("Class " + req.params.className + " deleted");
+    } else {
+      res.status(404).send({ message: "Class " + req.params.className + " do not exist" })
+    }
+  })
+  .catch((res) => res.status(500).send({ message: "Server error" }));
+});
+
 
 module.exports = router;

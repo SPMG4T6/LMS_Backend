@@ -71,7 +71,7 @@ app.use(function(err,req,res,next){
 // listen for requests
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, function(){
-    console.log(`🚀 Server ready at http://localhost:${PORT}`);
+    console.log(`🚀 Server ready at ${options.definition.servers[0].url}`);
 });
 
 module.exports = app;
