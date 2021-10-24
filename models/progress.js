@@ -19,8 +19,9 @@ const ProgressSchema = new Schema({
         type: String,
         required: [true, 'userID is required']
     },
-    courseMaterialID: {
-        type: Array
+    sectionMaterialName: {
+        type: String,
+        required: [true, 'sectionMaterialName is required']
     }
 });
 
