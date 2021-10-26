@@ -38,7 +38,7 @@ router.get('/classes',function(req,res,next) {
 
 /**
  * @swagger
- * /classes/view/{courseCode}:
+ * /class/view/{courseCode}:
  *  get:
  *    summary: Get classes by courseCode
  *    tags: [class]
