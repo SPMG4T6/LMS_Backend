@@ -334,6 +334,102 @@ router.post('/class', async function(req,res,next){
 
 /**
  * @swagger
+ * /class/quiz/{userID}:
+ *  post:
+ *    summary: Auto grade your quiz and update your user table if passed
+ *    description: Automatically grade your quiz, returns boolean. (if passes, automatically adds to User CompletedCourses Field)
+ *    tags: [class]
+ *    parameters:
+ *        - in: path
+ *          name: userID
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The User ID
+ *          example: 0123456
+ *    requestBody:
+ *      required: true
+ *      content: 
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              courseCode:
+ *                type: string
+ *              className:
+ *                type: string
+ *              quizAnswers:
+ *                type: array
+ *                items:
+ *                  answer:
+ *                    type: string
+ *                    example: print()
+ *                    
+ *            required:
+ *              - courseCode
+ *              - className
+ *              - quizAnswers
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ *      '404':
+ *        description: Class or User do not exist
+ *      '500':
+ *        description: Server error.
+ */
+router.post('/class/quiz/:userID', async function(req,res,next) {
+  
+  // Get answer in body
+  let submittedAnswerList = req.body.quizAnswers;
+
+  // compare to quizDetails in Class
+  let classDoc = await ClassModel.findOne({ courseCode: req.body.courseCode, className: req.body.className }).exec();
+  let user = await User.findOne({ userID: req.params.userID }).exec();
+  let courseDoc = await CourseModel.findOne({ courseCode: req.body.courseCode }).exec();
+
+  if (classDoc && courseDoc) {
+    if (user) {
+
+      let answerList = classDoc.quizDetails;
+      let passingMark = courseDoc.quizPassingMark;
+      let marksObtained = 0;
+
+      for (let i = 0; i < answerList.length; i++) {
+        if (answerList[i].answer === submittedAnswerList[i]) {
+          marksObtained += 1;
+        }
+      }
+
+      let marksOutput = marksObtained + "/" + answerList.length;
+
+      if (marksObtained >= passingMark) {
+        
+        let userLearningCourses = user.learningCourses;
+        let userCompletedCourses = user.completedCourses;
+        let index = userLearningCourses.indexOf(req.body.courseCode);
+
+
+        if (index > -1) {
+          userLearningCourses.splice(index, 1);
+          userCompletedCourses.push( [req.body.courseCode, marksOutput] );
+          user.learningCourses = userLearningCourses;
+          user.completedCourses = userCompletedCourses
+
+          await user.save();
+          res.status(200).send({ status: true, marks: marksOutput })
+
+        } else { 
+          res.status(404).send({ message: "User is not currently enrolled in the course"}); 
+        }
+      } else {
+        res.status(200).send({ status: false, marks: marksObtained + "/" + answerList.length })
+      }
+    } else { res.status(404).send({ message: "User " + req.params.userID + " do not exist." }) }
+  } else { res.status(404).send({ message: "Either " + req.body.courseCode + " or " + req.body.className + " do not exist." }) }
+})
+
+/**
+ * @swagger
  * /class/quiz:
  *  put:
  *    summary: Update the graded class quiz
@@ -506,6 +602,5 @@ router.delete('/class/:courseCode/:className',function(req,res,next) {
   })
   .catch((res) => res.status(500).send({ message: "Server error" }));
 });
-
 
 module.exports = router;
