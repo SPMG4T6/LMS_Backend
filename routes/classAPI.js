@@ -59,7 +59,7 @@ router.get('/classes',function(req,res,next) {
  *        description: Server error
  */
 // get class details by courseCode
-router.get('/classes/view/:courseCode', function(req,res,next) {
+router.get('/class/view/:courseCode', function(req,res,next) {
   ClassModel.find({"courseCode": req.params.courseCode})
   .then(response => {
     if (response.length > 0) {
@@ -150,27 +150,34 @@ router.get('/class/view/:courseCode/:className', function(req,res,next) {
  */
 // get all eligible users by courseCode and className
 router.get('/class/view/eligibleUsers/:courseCode/:className', async function(req,res,next) {
-  let courseDoc = await CourseModel.findOne({courseCode: req.params.courseCode})
+  let courseDoc = await CourseModel.findOne({ courseCode: req.params.courseCode })
   let classDoc = await ClassModel.findOne({ courseCode: req.params.courseCode, className: req.params.className });
-  User.find({})
-  .then(response => {
-    let eligibleUsers = courseEligibility({courseDoc: courseDoc, userArray: response, classDoc: classDoc})
-    .then(response => {
-      if (response.length > 0) {
-        // console.log(response);
-        res.send(response);
-      }
-      else {
-        res.status(404).send({ message: `No eligible learners available for this course` })
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({ message: "Server error" });
-    });
-  })
-  .catch((err) => {
-    res.status(500).send({ message: "Server error" })
-  })
+
+  if (courseDoc && classDoc) {
+    User.find({})
+      .then(response => {
+        let eligibleUsers = courseEligibility({courseDoc: courseDoc, userArray: response, classDoc: classDoc})
+        .then(response => {
+          if (response.length > 0) {
+            // console.log(response);
+            res.send(response);
+          }
+          else {
+            res.status(404).send({ message: `No eligible learners available for this course` })
+          }
+        })
+        .catch((err) => {
+          res.status(500).send({ message: "Server error" });
+        });
+      })
+      .catch((err) => {
+        res.status(500).send({ message: "Server error" })
+      })
+  } else {
+    res.status(500).send({ message: "Server error" });
+  }
+
+  
 
 });
 
@@ -487,7 +494,7 @@ router.put('/class/enrol/:userID', async function(req,res,next){
  *        description: Server error
  */
 // delete a user from the database
-router.delete('/class/:courseCode/:className',function(req,res,next){
+router.delete('/class/:courseCode/:className',function(req,res,next) {
   ClassModel.findOneAndDelete({ courseCode: req.params.courseCode, className: req.params.className })
   .exec()
   .then(function(c){
