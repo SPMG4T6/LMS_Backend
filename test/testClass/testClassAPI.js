@@ -1,8 +1,30 @@
 const request = require("supertest");
 const app = require("../../index");
-const { Class, Quiz, NotExistQuiz, Enrol, NotExistEnrol, Course, PrereqCourse, User, PrereqUser, Class1, Class2 } = require("./classSchema.js")
+const expect = require("chai").expect;
+const { Class, Quiz, NotExistQuiz, Answer, WrongAnswer, Enrol, NotExistEnrol, Course, Course1, PrereqCourse, User, PrereqUser, Class1, PrereqClass } = require("./classSchema.js")
 
 describe("TDD for Class", () => {
+
+  describe("Creating Dependencies", () => {
+    it("Creating dependencies", async () => {
+      const courseResponse = await request(app).post("/api/course").send(Course);
+      const course1Response = await request(app).post("/api/course").send(Course1);
+      const prereqResponse = await request(app).post("/api/course").send(PrereqCourse);
+      const class1Response = await request(app).post("/api/class").send(Class1);
+      const prereqClassResponse = await request(app).post("/api/class").send(PrereqClass);
+      const userResponse = await request(app).post("/api/user").send(User);
+      const prereqUserResponse = await request(app).post("/api/user").send(PrereqUser);
+  
+      expect(courseResponse.status).to.eql(200);
+      expect(course1Response.status).to.eql(200);
+      expect(class1Response.status).to.eql(200);
+      expect(prereqResponse.status).to.eql(200);
+      expect(prereqClassResponse.status).to.eql(200);
+      expect(userResponse.status).to.eql(200);
+      expect(prereqUserResponse.status).to.eql(200);
+    }).timeout(5000)
+  })
+  
 
   // CREATE
   describe("POST Endpoints", () => {
@@ -13,6 +35,24 @@ describe("TDD for Class", () => {
     it("POST Duplicate: /api/class", (done) => {
       request(app).post("/api/class").send(Class).expect(400, done);
     })
+
+    it("POST Auto Grading (FAIL): /api/class/quiz/" + User.userID, async () => {
+      const response = await request(app).post("/api/class/quiz/" + User.userID).send(WrongAnswer); // using class1
+      const user = await request(app).get("/api/user/" + User.userID);
+
+      expect(response.body.status).to.eql(false);
+      expect(user.body[0].learningCourses).to.includes(Course1.courseCode)
+      expect(user.body[0].completedCourses).to.not.include(Course1.courseCode)
+    }).timeout(5000);
+
+    it("POST Auto Grading (PASS): /api/class/quiz/" + User.userID, async () => {
+      const response = await request(app).post("/api/class/quiz/" + User.userID).send(Answer); // using class1
+      const user = await request(app).get("/api/user/" + User.userID);
+
+      expect(response.body.status).to.eql(true);
+      expect(user.body[0].learningCourses).to.not.includes(Course1.courseCode)
+      expect(user.body[0].completedCourses).to.deep.include([ Course1.courseCode, response.body.marks ])
+    }).timeout(5000);
   });
 
   // GET
@@ -38,29 +78,27 @@ describe("TDD for Class", () => {
     })
 
     // GET Eligible users 
-    it("GET Eligible Users with courseCode & className: /api/class/view/eligibleUsers/" + Class.courseCode + "/" + Class.className, (done) => {
-      request(app).post("/api/course").send(Course).expect(200);
-      request(app).post("/api/class").send(Class1).expect(200);
-      request(app).get("/api/class/view/eligibleUsers/" + Class.courseCode + "/" + Class.className).expect(200);
-      done()
+    it("GET Eligible Users with courseCode & className: /api/class/view/eligibleUsers/" + Class.courseCode + "/" + Class.className, async () => {
+      const response = await request(app).get("/api/class/view/eligibleUsers/" + Class.courseCode + "/" + Class.className);
+      const user = await request(app).get("/api/user/" + User.userID);
+      expect(response.status).to.eql(200);
+      expect(response.body).to.deep.include(user.body[0]);
     })
 
     // GET Eligible users with Prerequisites
-    it("GET Eligible Users with courseCode & className with Prerequisites: /api/class/view/eligibleUsers/" + PrereqCourse.courseCode + "/" + Class.className, (done) => {
-      request(app).post("/api/course").send(PrereqCourse).expect(200);
-      request(app).get("/api/class/view/eligibleUsers/" + PrereqCourse.courseCode + "/" + Class.className).expect(200);
-      done()
+    it("GET Eligible Users with courseCode & className with Prerequisites: /api/class/view/eligibleUsers/" + PrereqClass.courseCode + "/" + PrereqClass.className, async () => {
+      const response = await request(app).get("/api/class/view/eligibleUsers/" + PrereqClass.courseCode + "/" + PrereqClass.className);
+      const user = await request(app).get("/api/user/" + PrereqUser.userID);
+      expect(response.status).to.eql(200);
+      expect(response.body).to.eql(user.body); // to prove that it exists
     })
 
-    it("GET Non-existent Eligible Users with courseCode & className: /api/class/view/eligibleUsers/IS999000/Fundamental Programming III", (done) => {
-      request(app).get("/api/class/view/eligibleUsers/IS999000/Fundamental Programming III").expect(404);
-      request(app).delete("/api/course/delete/" + PrereqCourse.courseCode).expect(200)
-      request(app).delete("/api/course/delete/" + Course.courseCode).expect(200)
-      request(app).delete("/api/class/" + Class1.courseCode + "/" + Class1.className).expect(200);
-      done()
+    // GET Non-existent eligible users
+    it("GET Non-existent Eligible Users with courseCode & className: /api/class/view/eligibleUsers/IS999000/G111222", (done) => {
+      request(app).get("/api/class/view/eligibleUsers/IS999000/G111222").expect(404, done);
     })
-
-    // Enrolled students
+ 
+    // Enrolled students 
     it("GET Enrolled Students with courseCode & className: /api/class/view/enrolledUsers/" + Class.courseCode + "/" + Class.className, (done) => {
       request(app).get("/api/class/view/enrolledUsers/" + Class.courseCode + "/" + Class.className).expect(200, done);
     })
@@ -80,12 +118,12 @@ describe("TDD for Class", () => {
       request(app).put("/api/class/quiz").send(NotExistQuiz).expect(404, done);
     })
 
-    it("PUT Learner Enrolling: /api/enrol/1", (done) => {
-      request(app).put("/api/class/enrol/1").send(Enrol).expect(200, done);
+    it("PUT Learner Enrolling: /api/enrol/" + User.userID, (done) => {
+      request(app).put("/api/class/enrol/" + User.userID).send(Enrol).expect(200, done);
     })
 
-    it("PUT Learner Enrolling (Non-existent courseCode & className): /api/enrol/1", (done) => {
-      request(app).put("/api/class/enrol/1").send(NotExistEnrol).expect(404, done);
+    it("PUT Learner Enrolling (Non-existent courseCode & className): /api/enrol/" + User.userID, (done) => {
+      request(app).put("/api/class/enrol/" + User.userID).send(NotExistEnrol).expect(404, done);
     })
 
     it("PUT Learner Enrolling (Non-existent Learner): /api/enrol/1111111", (done) => {
@@ -103,4 +141,24 @@ describe("TDD for Class", () => {
       request(app).delete("/api/class/IS999000/G111222").expect(404, done);
     })
   });
+
+  describe("Deleting Dependencies", () => {
+    it("Deleting dependencies", async () => {
+      const courseResponse = await request(app).delete("/api/course/delete/" + Course.courseCode);
+      const course1Response = await request(app).delete("/api/course/delete/" + Course1.courseCode);
+      const class1Response = await request(app).delete("/api/class/" + Class1.courseCode + "/" + Class1.className);
+      const prereqClassResponse = await request(app).delete("/api/class/" + PrereqClass.courseCode + "/" + PrereqClass.className);
+      const prereqResponse = await request(app).delete("/api/course/delete/" + PrereqCourse.courseCode);
+      const userResponse = await request(app).delete("/api/user/" + User.userID);
+      const prereqUserResponse = await request(app).delete("/api/user/" + PrereqUser.userID);
+  
+      expect(courseResponse.status).to.eql(200);
+      expect(course1Response.status).to.eql(200);
+      expect(class1Response.status).to.eql(200);
+      expect(prereqClassResponse.status).to.eql(200);
+      expect(prereqResponse.status).to.eql(200);
+      expect(userResponse.status).to.eql(200);
+      expect(prereqUserResponse.status).to.eql(200);
+    }).timeout(5000)
+  })
 })

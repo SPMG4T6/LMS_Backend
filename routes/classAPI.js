@@ -156,7 +156,7 @@ router.get('/class/view/eligibleUsers/:courseCode/:className', async function(re
   if (courseDoc && classDoc) {
     User.find({})
       .then(response => {
-        let eligibleUsers = courseEligibility({courseDoc: courseDoc, userArray: response, classDoc: classDoc})
+        courseEligibility({courseDoc: courseDoc, userArray: response, classDoc: classDoc})
         .then(response => {
           if (response.length > 0) {
             // console.log(response);
@@ -174,10 +174,8 @@ router.get('/class/view/eligibleUsers/:courseCode/:className', async function(re
         res.status(500).send({ message: "Server error" })
       })
   } else {
-    res.status(500).send({ message: "Server error" });
+    res.status(404).send({ message: "courseCode: " + req.params.courseCode + " or className: " + req.params.className + " do not exist" });
   }
-
-  
 
 });
 
@@ -346,7 +344,7 @@ router.post('/class', async function(req,res,next){
  *            type: string
  *          required: true
  *          description: The User ID
- *          example: 0123456
+ *          example: 1
  *    requestBody:
  *      required: true
  *      content: 
@@ -391,41 +389,47 @@ router.post('/class/quiz/:userID', async function(req,res,next) {
     if (user) {
 
       let answerList = classDoc.quizDetails;
-      let passingMark = courseDoc.quizPassingMark;
+      let passingMark = courseDoc.quizPassingMark; // it is in percentage
       let marksObtained = 0;
 
-      for (let i = 0; i < answerList.length; i++) {
-        if (answerList[i].answer === submittedAnswerList[i]) {
-          marksObtained += 1;
+      if (submittedAnswerList.length === answerList.length) {
+        for (let i = 0; i < answerList.length; i++) {
+          if (answerList[i].answer === submittedAnswerList[i]) {
+            marksObtained += 1;
+          }
         }
-      }
-
-      let marksOutput = marksObtained + "/" + answerList.length;
-
-      if (marksObtained >= passingMark) {
-        
-        let userLearningCourses = user.learningCourses;
-        let userCompletedCourses = user.completedCourses;
-        let index = userLearningCourses.indexOf(req.body.courseCode);
-
-
-        if (index > -1) {
-          userLearningCourses.splice(index, 1);
-          userCompletedCourses.push( [req.body.courseCode, marksOutput] );
-          user.learningCourses = userLearningCourses;
-          user.completedCourses = userCompletedCourses
-
-          await user.save();
-          res.status(200).send({ status: true, marks: marksOutput })
-
-        } else { 
-          res.status(404).send({ message: "User is not currently enrolled in the course"}); 
+  
+        let marksOutput = marksObtained + "/" + answerList.length;
+  
+        let results = (marksObtained / answerList.length) * 100;
+  
+        if (results >= passingMark) {
+          
+          let userLearningCourses = user.learningCourses;
+          let userCompletedCourses = user.completedCourses;
+          let index = userLearningCourses.indexOf(req.body.courseCode);
+  
+  
+          if (index > -1) {
+            userLearningCourses.splice(index, 1);
+            userCompletedCourses.push( [req.body.courseCode, marksOutput] );
+            user.learningCourses = userLearningCourses;
+            user.completedCourses = userCompletedCourses
+  
+            await user.save();
+            res.status(200).send({ status: true, marks: marksOutput })
+  
+          } else { 
+            res.status(404).send({ message: "User is not currently enrolled in the course"}); 
+          }
+        } else {
+          res.status(200).send({ status: false, marks: marksObtained + "/" + answerList.length })
         }
       } else {
-        res.status(200).send({ status: false, marks: marksObtained + "/" + answerList.length })
+        res.status(400).send("Invalid answer list");
       }
     } else { res.status(404).send({ message: "User " + req.params.userID + " do not exist." }) }
-  } else { res.status(404).send({ message: "Either " + req.body.courseCode + " or " + req.body.className + " do not exist." }) }
+  } else { res.status(404).send({ message: "Either courseCode: " + req.body.courseCode + ", or className: " + req.body.className + ", do not exist." }) }
 })
 
 /**

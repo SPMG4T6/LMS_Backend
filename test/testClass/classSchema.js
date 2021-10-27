@@ -30,14 +30,14 @@ module.exports.Quiz = {
   "className": "G111",
   "quizDetails": [
     {
-      "question": "How to get an input in Python?",
+      "question": "How do you print?",
       "option": [
-        "input()", "scanner.nextLine()", "input[]", "next()"
+        "print()", "print[]", "printNow()"
       ],
       "answer": "0",
       "duration": 10
     }
-  ]
+  ],
 }
 
 module.exports.NotExistQuiz = {
@@ -55,6 +55,22 @@ module.exports.NotExistQuiz = {
   ]
 }
 
+module.exports.Answer = {
+  "courseCode": "IS888",
+  "className": "G111",
+  "quizAnswers": [
+    "upwards", "Yes", "Yes", "Purple", "hey"
+  ]
+}
+
+module.exports.WrongAnswer = {
+  "courseCode": "IS888",
+  "className": "G111",
+  "quizAnswers": [
+    "upwards", "No", "Yes", "Purple", "hey"
+  ]
+}
+
 module.exports.Enrol = {
   "courseCode": "IS999",
   "className": "G111"
@@ -66,23 +82,23 @@ module.exports.NotExistEnrol = {
 }
 
 module.exports.Course = {
+  "courseCode": "IS999",
+  "courseTitle": "Fundamental Programming I",
+  "courseDescription": "Fun mod",
+  "prereqCourses": [
+    
+  ],
+  "quizPassingMark": "50"
+}
+
+module.exports.Course1 = {
   "courseCode": "IS888",
   "courseTitle": "Innovation",
   "courseDescription": "Fluff mod",
   "prereqCourses": [
     
   ],
-  "quizPassingMark": "70"
-}
-
-module.exports.PrereqCourse = {
-  "courseCode": "IS777",
-  "courseTitle": "Innovating my society",
-  "courseDescription": "The best Fluff mod ever",
-  "prereqCourses": [
-    "IS888"
-  ],
-  "quizPassingMark": "70"
+  "quizPassingMark": "60"
 }
 
 module.exports.User = {
@@ -90,7 +106,7 @@ module.exports.User = {
   "userName": "Tester_Learner",
   "userType": "learner",
   "learningCourses": [
-    
+    "IS888"
   ],
   "teachingCourses": [
     
@@ -99,22 +115,6 @@ module.exports.User = {
     
   ]
 }
-
-module.exports.PrereqUser = {
-  "userID": "999",
-  "userName": "Tester_PrereqLearner",
-  "userType": "learner",
-  "learningCourses": [
-    
-  ],
-  "teachingCourses": [
-    
-  ],
-  "completedCourses": [
-    "IS777"
-  ]
-}
-
 
 module.exports.Class1 = {
   "courseCode": "IS888",
@@ -124,11 +124,51 @@ module.exports.Class1 = {
   ],
   "quizDetails": [
     {
-      "question": "How do you print?",
+      "question": "What is the right way to eat?",
       "option": [
-        "print()", "print[]", "printNow()"
+        "upwards",
+        "left",
+        "right"
       ],
-      "answer": "0",
+      "answer": "upwards",
+      "duration": 10
+    },
+    {
+      "question": "What is the right way to eat?",
+      "option": [
+        "Yes",
+        "No"
+      ],
+      "answer": "Yes",
+      "duration": 10
+    },
+    {
+      "question": "Can birds play?",
+      "option": [
+        "Yes",
+        "No"
+      ],
+      "answer": "Yes",
+      "duration": 10
+    },
+    {
+      "question": "What is the color of China flag?",
+      "option": [
+        "Red",
+        "Blue",
+        "purple"
+      ],
+      "answer": "Red",
+      "duration": 10
+    },
+    {
+      "question": "Why are you gay?",
+      "option": [
+        "Because I am born like that",
+        "I am not",
+        "I am only human"
+      ],
+      "answer": "I am only human",
       "duration": 10
     }
   ],
@@ -143,7 +183,32 @@ module.exports.Class1 = {
   ]
 }
 
-module.exports.Class2 = {
+module.exports.PrereqUser = {
+  "userID": "777",
+  "userName": "Tester_PrereqLearner",
+  "userType": "learner",
+  "learningCourses": [
+    
+  ],
+  "teachingCourses": [
+    
+  ],
+  "completedCourses": [
+    "IS888"
+  ]
+}
+
+module.exports.PrereqCourse = {
+  "courseCode": "IS777",
+  "courseTitle": "Innovating my society",
+  "courseDescription": "The best Fluff mod ever",
+  "prereqCourses": [
+    "IS888"
+  ],
+  "quizPassingMark": "70"
+}
+
+module.exports.PrereqClass = {
   "courseCode": "IS777",
   "className": "G222",
   "userID": [
@@ -166,6 +231,6 @@ module.exports.Class2 = {
   "minClassSize": 10,
   "maxClassSize": 30,
   "enrolledStudents": [
-    "1"
+    
   ]
 }
