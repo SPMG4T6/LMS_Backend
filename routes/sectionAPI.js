@@ -44,6 +44,19 @@ router.get('/sections',function(req,res,next) {
  *  get:
  *    summary: Get a list of sections within a specific class of a specific course
  *    tags: [section]
+ *    parameters:
+ *        - in: path
+ *          name: courseCode
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The course code of the course
+ *        - in: path
+ *          name: className
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The class name within the course
  *    responses:
  *      '200':
  *        description: A successful response
@@ -63,6 +76,25 @@ router.get('/sections/:courseCode/:className', function(req, res, next) {
  *  get:
  *    summary: Get a specific section within a specific class of a specific course
  *    tags: [section]
+ *    parameters:
+ *        - in: path
+ *          name: courseCode
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The course code of the course
+ *        - in: path
+ *          name: className
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The class name within the course
+ *        - in: path
+ *          name: sectionName
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The section name within the class of the course
  *    responses:
  *      '200':
  *        description: A successful response
