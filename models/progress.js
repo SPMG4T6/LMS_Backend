@@ -20,8 +20,12 @@ const ProgressSchema = new Schema({
         required: [true, 'userID is required']
     },
     sectionMaterialName: {
-        type: String,
-        required: [true, 'sectionMaterialName is required']
+        type: Array,
+        default: []
+    },
+    isSectionQuizComplete: {
+        type: Boolean,
+        default: false
     }
 });
 

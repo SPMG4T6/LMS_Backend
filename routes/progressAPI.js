@@ -126,13 +126,16 @@ router.get('/progress/:courseCode/:className/:sectionName/:userID', function (re
  *              userID:
  *                type: string
  *              sectionMaterialName:
- *                type: string
+ *                type: array
+ *                default: []
+ *              isSectionQuizComplete:
+ *                type: boolean
+ *                default: false
  *            required:
  *              - courseCode
  *              - className
  *              - sectionName
  *              - userID
- *              - sectionMaterialName
  *    responses:
  *      '200':
  *        description: A successful response
@@ -150,69 +153,71 @@ router.post('/progress', function (req, res, next) {
         });
 });
 
-/**
- * @swagger
- * /progress/{courseCode}/{className}/{sectionName}/{userID}/{sectionMaterialName}:
- *  delete:
- *    summary: Delete a progress record
- *    tags: [progress]
- *    parameters:
- *        - in: path
- *          name: courseCode
- *          schema:
- *            type: string
- *          required: true
- *          description: The course code of the course
- *        - in: path
- *          name: className
- *          schema:
- *            type: string
- *          required: true
- *          description: The class name within the course
- *        - in: path
- *          name: sectionName
- *          schema:
- *            type: string
- *          required: true
- *          description: The section name within the class of the course
- *        - in: path
- *          name: userID
- *          schema:
- *            type: string
- *          required: true
- *          description: A user's ID
- *        - in: path
- *          name: sectionMaterialName
- *          schema:
- *            type: string
- *          required: true
- *          description: The specific section materials name in the section
- *    responses:
- *      '200':
- *        description: A successful response
- *      '404':
- *        description: Progress record not found, not deleted
- *      '500':
- *        description: Server error
- */
-// delete a progress record from the database
-router.delete('/progress/:courseCode/:className/:sectionName/:userID/:sectionMaterialName', function (req, res, next) {
-    Progress.findOneAndDelete({
-        userID: req.params.userID,
-        courseCode: req.params.courseCode,
-        className: req.params.className,
-        sectionName: req.params.sectionName,
-        sectionMaterialName: req.params.sectionMaterialName,
-    })
-        .then(function (progress) {
-            if (progress !== null) {
-                res.status(200).send(progress);
-            } else {
-                res.status(404).send({ "message": "No such record was found" });
-            }
-        })
-        .catch(res => {
-            res.status(500).send({ "message": "Server error" })
-        });
-});
+// /**
+//  * @swagger
+//  * /progress/{courseCode}/{className}/{sectionName}/{userID}/{sectionMaterialName}:
+//  *  delete:
+//  *    summary: Delete a progress record
+//  *    tags: [progress]
+//  *    parameters:
+//  *        - in: path
+//  *          name: courseCode
+//  *          schema:
+//  *            type: string
+//  *          required: true
+//  *          description: The course code of the course
+//  *        - in: path
+//  *          name: className
+//  *          schema:
+//  *            type: string
+//  *          required: true
+//  *          description: The class name within the course
+//  *        - in: path
+//  *          name: sectionName
+//  *          schema:
+//  *            type: string
+//  *          required: true
+//  *          description: The section name within the class of the course
+//  *        - in: path
+//  *          name: userID
+//  *          schema:
+//  *            type: string
+//  *          required: true
+//  *          description: A user's ID
+//  *        - in: path
+//  *          name: sectionMaterialName
+//  *          schema:
+//  *            type: string
+//  *          required: true
+//  *          description: The specific section materials name in the section
+//  *    responses:
+//  *      '200':
+//  *        description: A successful response
+//  *      '404':
+//  *        description: Progress record not found, not deleted
+//  *      '500':
+//  *        description: Server error
+//  */
+// // delete a progress record from the database
+// router.delete('/progress/:courseCode/:className/:sectionName/:userID/:sectionMaterialName', function (req, res, next) {
+//     Progress.findOneAndDelete({
+//         userID: req.params.userID,
+//         courseCode: req.params.courseCode,
+//         className: req.params.className,
+//         sectionName: req.params.sectionName,
+//         sectionMaterialName: req.params.sectionMaterialName,
+//     })
+//         .then(function (progress) {
+//             if (progress !== null) {
+//                 res.status(200).send(progress);
+//             } else {
+//                 res.status(404).send({ "message": "No such record was found" });
+//             }
+//         })
+//         .catch(res => {
+//             res.status(500).send({ "message": "Server error" })
+//         });
+// });
+
+
 module.exports = router;
