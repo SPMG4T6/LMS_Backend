@@ -189,6 +189,28 @@ router.post('/classApplied',function(req,res){
  *  delete:
  *    summary: Delete a classApplied data
  *    tags: [classApplied]
+  *    parameters:
+ *        - in: path
+ *          name: courseCode
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: Course Code
+ *          example: IS212
+ *        - in: path
+ *          name: className
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: Class Name
+ *          example: G1
+ *        - in: path
+ *          name: userID
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: User ID
+ *          example: 1
  *    responses:
  *      '200':
  *        description: A successful response
