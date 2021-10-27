@@ -207,26 +207,21 @@ router.get('/progress/status/:courseCode/:className/:sectionName/:userID', async
   })
 
   if (doc) {
-    if (doc.isSectionQuizComplete) {
-      res.status(200).send({ status: true })
+    let isComplete = false;
+    let sectionDoc = await Section.findOne({ 
+      courseCode: req.params.courseCode,
+      className: req.params.className,
+      sectionName: req.params.sectionName
+    })
+
+    if (sectionDoc) {
+      if (sectionDoc.sectionMaterial.length === doc.sectionMaterialName.length && doc.isSectionQuizComplete) {
+        isComplete = true;
+      } 
+
+      res.status(200).send({ status: isComplete })
     } else {
-      
-      let isComplete = false;
-      let sectionDoc = await Section.findOne({ 
-        courseCode: req.params.courseCode,
-        className: req.params.className,
-        sectionName: req.params.sectionName
-      })
-
-      if (sectionDoc) {
-        if (sectionDoc.sectionMaterial.length === doc.sectionMaterialName.length && doc.isSectionQuizComplete) {
-          isComplete = true;
-        } 
-
-        res.status(200).send({ status: isComplete })
-      } else {
-        res.status(404).send("Section do not exist");
-      }
+      res.status(404).send("Section do not exist");
     }
   } else {
     res.status(404).send({ message: "Progress not found" })
