@@ -167,11 +167,11 @@ router.get('/class/view/eligibleUsers/:courseCode/:className', async function(re
           }
         })
         .catch((err) => {
-          res.status(500).send({ message: "Server error" });
+          res.status(400).send({ message: `${err}` });
         });
       })
       .catch((err) => {
-        res.status(500).send({ message: "Server error" })
+        res.status(500).send({ message: `${err}` })
       })
   } else {
     res.status(404).send({ message: "courseCode: " + req.params.courseCode + " or className: " + req.params.className + " do not exist" });
