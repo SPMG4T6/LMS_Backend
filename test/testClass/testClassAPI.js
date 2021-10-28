@@ -36,8 +36,8 @@ describe("TDD for Class", () => {
       request(app).post("/api/class").send(Class).expect(400, done);
     })
 
-    it("POST Auto Grading (FAIL): /api/class/quiz/" + User.userID, async () => {
-      const response = await request(app).post("/api/class/quiz/" + User.userID).send(WrongAnswer); // using class1
+    it("POST Auto Grading (FAIL): /api/class/quiz/ungraded/" + User.userID, async () => {
+      const response = await request(app).post("/api/class/quiz/ungraded/" + User.userID).send(WrongAnswer); // using class1
       const user = await request(app).get("/api/user/" + User.userID);
 
       expect(response.body.status).to.eql(false);
@@ -45,8 +45,8 @@ describe("TDD for Class", () => {
       expect(user.body[0].completedCourses).to.not.include(Course1.courseCode)
     }).timeout(5000);
 
-    it("POST Auto Grading (PASS): /api/class/quiz/" + User.userID, async () => {
-      const response = await request(app).post("/api/class/quiz/" + User.userID).send(Answer); // using class1
+    it("POST Auto Grading (PASS): /api/class/quiz/graded/" + User.userID, async () => {
+      const response = await request(app).post("/api/class/quiz/graded/" + User.userID).send(Answer); // using class1
       const user = await request(app).get("/api/user/" + User.userID);
 
       expect(response.body.status).to.eql(true);
@@ -98,7 +98,7 @@ describe("TDD for Class", () => {
       request(app).get("/api/class/view/eligibleUsers/IS999000/G111222").expect(404, done);
     })
  
-    // Enrolled students 
+    // Enrolled students ?????????????????
     it("GET Enrolled Students with courseCode & className: /api/class/view/enrolledUsers/" + Class.courseCode + "/" + Class.className, (done) => {
       request(app).get("/api/class/view/enrolledUsers/" + Class.courseCode + "/" + Class.className).expect(200, done);
     })

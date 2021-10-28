@@ -127,17 +127,10 @@ router.post('/user', async function (req, res, next) {
 
 /**
  * @swagger
- * /user/{userID}:
+ * /user:
  *  put:
  *    summary: Update a user
  *    tags: [user]
- *    parameters:
- *        - in: path
- *          name: userID
- *          schema:
- *            type: string
- *          required: true
- *          description: A user's ID
  *    requestBody:
  *      required: true
  *      content: 
@@ -182,8 +175,8 @@ router.post('/user', async function (req, res, next) {
  *        description: Server error
  */
 // update a user in the database
-router.put('/user/:userID', function (req, res, next) {
-    User.findOneAndUpdate({ userID: req.params.userID }, req.body, { new: true }, (err, doc) => {
+router.put('/user', function (req, res, next) {
+    User.findOneAndUpdate({ userID: req.body.userID }, req.body, { new: true }, (err, doc) => {
         if (err) res.status(500).send({ "message": "Server error" });
         if (doc !== null) {
             res.status(200).send(doc);
