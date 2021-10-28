@@ -332,12 +332,19 @@ router.post('/class', async function(req,res,next){
 
 /**
  * @swagger
- * /class/quiz/{userID}:
+ * /class/quiz/{quizType}/{userID}:
  *  post:
  *    summary: Auto grade your quiz and update your user table if passed
  *    description: Automatically grade your quiz, returns boolean. (if passes, automatically adds to User CompletedCourses Field)
  *    tags: [class]
  *    parameters:
+ *        - in: path
+ *          name: quizType
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: Either "graded" or "ungraded" only
+ *          example: graded
  *        - in: path
  *          name: userID
  *          schema:
@@ -375,10 +382,13 @@ router.post('/class', async function(req,res,next){
  *      '500':
  *        description: Server error.
  */
-router.post('/class/quiz/:userID', async function(req,res,next) {
+router.post('/class/quiz/:quizType/:userID', async function(req,res,next) {
   
   // Get answer in body
   let submittedAnswerList = req.body.quizAnswers;
+
+  // Quiz Type -> Can only be "graded" or "ungraded"
+  let quizType = req.params.quizType;
 
   // compare to quizDetails in Class
   let classDoc = await ClassModel.findOne({ courseCode: req.body.courseCode, className: req.body.className }).exec();
@@ -388,45 +398,60 @@ router.post('/class/quiz/:userID', async function(req,res,next) {
   if (classDoc && courseDoc) {
     if (user) {
 
-      let answerList = classDoc.quizDetails;
+      let quizDetails = classDoc.quizDetails;
       let passingMark = courseDoc.quizPassingMark; // it is in percentage
       let marksObtained = 0;
+      let updatedQuizDetails = classDoc.quizDetails;
 
-      if (submittedAnswerList.length === answerList.length) {
-        for (let i = 0; i < answerList.length; i++) {
-          if (answerList[i].answer === submittedAnswerList[i]) {
+      if (submittedAnswerList.length === quizDetails.length) {
+        for (let i = 0; i < quizDetails.length; i++) {
+          updatedQuizDetails[i]["selected"] = submittedAnswerList[i];
+          
+          if (quizDetails[i].answer === submittedAnswerList[i]) {
             marksObtained += 1;
+            updatedQuizDetails[i]["result"] = true;
+          } else { 
+            updatedQuizDetails[i]["result"] = false; 
           }
         }
   
-        let marksOutput = marksObtained + "/" + answerList.length;
+        let marksOutput = marksObtained + "/" + quizDetails.length;
+        let results = (marksObtained / quizDetails.length) * 100;
   
-        let results = (marksObtained / answerList.length) * 100;
-  
-        if (results >= passingMark) {
+        if (results >= passingMark) { // Passed the quiz
           
           let userLearningCourses = user.learningCourses;
           let userCompletedCourses = user.completedCourses;
-          let index = userLearningCourses.indexOf(req.body.courseCode);
+          let learningCoursesIndex = userLearningCourses.indexOf(req.body.courseCode);
+          var completed = false;
+
+          for (let i = 0; i < userCompletedCourses.length; i++) {
+            if (userCompletedCourses[i][0] == req.body.courseCode) {
+              completed = true;
+            }
+          }
   
-  
-          if (index > -1) {
-            userLearningCourses.splice(index, 1);
-            userCompletedCourses.push( [req.body.courseCode, marksOutput] );
-            user.learningCourses = userLearningCourses;
-            user.completedCourses = userCompletedCourses
-  
-            await user.save();
-            res.status(200).send({ status: true, marks: marksOutput })
+          if (learningCoursesIndex > -1 || completed) { // checks that this course exist in user learningCourses && not completed field
+            
+            if (quizType == "graded" && !completed) { // only update user if its "graded"
+              userLearningCourses.splice(learningCoursesIndex, 1);
+              userCompletedCourses.push( [req.body.courseCode, marksOutput] );
+              user.learningCourses = userLearningCourses;
+              user.completedCourses = userCompletedCourses
+    
+              await user.save(); // updating the user
+            }
+
+            res.status(200).send({ status: true, marks: marksOutput, quizDetails: updatedQuizDetails })
   
           } else { 
-            res.status(404).send({ message: "User is not currently enrolled in the course"}); 
+            res.status(404).send({ message: "User has neither enrolled or completed the course"}); 
           }
-        } else {
-          res.status(200).send({ status: false, marks: marksObtained + "/" + answerList.length })
+        } else { // Quiz Failed
+          res.status(200).send({ status: false, marks: marksOutput, quizDetails: updatedQuizDetails })
         }
       } else {
-        res.status(400).send("Invalid answer list");
+        res.status(400).send({ message: "Quiz details and quiz answer length do not match" });
       }
     } else { res.status(404).send({ message: "User " + req.params.userID + " do not exist." }) }
   } else { res.status(404).send({ message: "Either courseCode: " + req.body.courseCode + ", or className: " + req.body.className + ", do not exist." }) }

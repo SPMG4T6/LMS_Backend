@@ -36,8 +36,8 @@ describe("TDD for User", () => {
     });
 
     describe("PUT Endpoints", () => {
-        it("Update user 1 details: /api/user/:userID", (done) => {
-            request(app).put("/api/user/" + User1.userID)
+        it("Update user 1 details: /api/user", (done) => {
+            request(app).put("/api/user")
                 .send(NewUser1)
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
