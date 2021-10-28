@@ -529,6 +529,50 @@ router.put('/class/quiz', function (req, res, next) {
 
 /**
  * @swagger
+ * /class/enrolmentdate:
+ *  put:
+ *    summary: Update the start enrolment and end enrolment dates
+ *    description: Replaces the start and end enrolment dates in the database with your request body's start and end enrolment dates
+ *    tags: [class]
+ *    requestBody:
+ *      required: true
+ *      content: 
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              courseCode:
+ *                type: string
+ *              className:
+ *                type: string
+ *              enrolmentStartDate:
+ *                type: string
+ *              enrolmentEndDate:
+ *                type: string
+ *            required:
+ *              - courseCode
+ *              - className
+ *              - enrolmentStartDate
+ *              - enrolmentEndDate
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ *      '404':
+ *        description: Class XXX (className) do not exist
+ *      '500':
+ *        description: Server error.
+ */
+// Update a grade quiz for the class
+router.put('/class/enrolmentdate', function (req, res, next) {
+  ClassModel.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className }, { enrolmentStartDate: req.body.enrolmentStartDate, enrolmentEndDate: req.body.enrolmentEndDate }, { new: true }, (err, doc) => {
+    if (err) { res.status(500).send({ message: "Server error" }) };
+    if (doc) { res.status(200).send(doc); } // returns the update
+    else { res.status(404).send({ message: "Class " + req.body.className + " do not exist" }) }
+  })
+})
+
+/**
+ * @swagger
  * /class/enrol/{userID}:
  *  put:
  *    summary: Assigning an engineer to a class
