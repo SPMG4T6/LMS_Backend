@@ -314,9 +314,25 @@ router.get('/class/view/enrolledUsers/:courseCode/:className', async function (r
  *        description: Server error
  */
 // add a new class to database
-router.post('/class', async function (req, res, next) {
-  let searchResult = await ClassModel.findOne({ courseCode: req.body.courseCode, className: req.body.className });
+router.post('/class', async function(req,res){
+  let searchResult = await ClassModel.findOne({courseCode: req.body.courseCode, className: req.body.className});
   if (!searchResult) {
+    const trainerIDArray = req.body.userID;
+    const courseCode = req.body.courseCode;
+    trainerIDArray.forEach(element => {
+      User.findOne({userID: element})
+      .then(response => {
+        const teachingCourses = response.teachingCourses;
+        if (!teachingCourses.includes(courseCode)) {
+          teachingCourses.push(courseCode);
+        }
+        User.findOneAndUpdate({userID: element}, {teachingCourses: teachingCourses}, {new: true}, (err, doc) => {
+            if (err) { res.status(500).send({ message: "Server error" }) };
+            if (doc) { } // returns the update
+            else { res.status(404).send({ message: "User " + element + " does not exist" }) }
+        })
+      })
+    })
     ClassModel.create(req.body)
       .then(response => {
         // class successfully created, need to create 1 section now
@@ -331,11 +347,12 @@ router.post('/class', async function (req, res, next) {
           .then(function (sectionCreated) {
             res.status(200).send([sectionCreated, response])
           })
-          .catch(res => {
-            res.status(500).send({ message: "Server error" })
+          .catch(response => {
+            res.status(500).send({ message: "Server error here" })
           });
       })
-      .catch(res => {
+      .catch(response => {
+        // console.log(response);
         res.status(500).send({ message: "Server error" })
       });
   }
