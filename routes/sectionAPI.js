@@ -183,6 +183,7 @@ router.get('/section/material/:courseCode/:className/:sectionName/:materialName'
  *                type: string
  *              sectionSequence:
  *                type: integer
+ *                example: 1
  *              quizDetails:
  *                type: array
  *                items:
