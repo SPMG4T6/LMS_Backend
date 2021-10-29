@@ -157,22 +157,22 @@ router.get('/class/view/eligibleUsers/:courseCode/:className', async function (r
   if (courseDoc && classDoc) {
     User.find({})
       .then(response => {
-        courseEligibility({ courseDoc: courseDoc, userArray: response, classDoc: classDoc })
-          .then(response => {
-            if (response.length > 0) {
-              // console.log(response);
-              res.send(response);
-            }
-            else {
-              res.status(404).send({ message: `No eligible learners available for this course` })
-            }
-          })
-          .catch((err) => {
-            res.status(400).send({ message: `${err}` });
-          });
+        courseEligibility({courseDoc: courseDoc, userArray: response, classDoc: classDoc})
+        .then(response => {
+          if (response.length > 0) {
+            // console.log(response);
+            res.send(response);
+          }
+          else {
+            res.status(404).send({ message: `No eligible learners available for this course` })
+          }
+        })
+        .catch((err) => {
+          res.status(400).send({ message: `${err}` });
+        });
       })
       .catch((err) => {
-        res.status(500).send({ message: "Server error" })
+        res.status(500).send({ message: `${err}` })
       })
   } else {
     res.status(404).send({ message: "courseCode: " + req.params.courseCode + " or className: " + req.params.className + " do not exist" });
