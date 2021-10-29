@@ -11,7 +11,8 @@ const uploadController = (req) =>
         let promiseArray = [];
         let toUploadCounter = 0;
         let urlCounter = 0;
-        let folderName = req.body.courseCode + "_" + req.body.className + "_" + req.body.sectionName.replace(" ", "+");
+        let sectionName = req.body.sectionName;
+        let folderName = req.body.courseCode + "_" + req.body.className + "_" + sectionName.split(" ").join("_");
 
         // array of file objects
         const filesArray = req.files;
