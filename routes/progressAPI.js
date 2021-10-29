@@ -1,7 +1,7 @@
 const express = require('express');
+const progress = require('../models/progress');
 const router = express.Router();
 const Progress = require('../models/progress');
-const Section = require('../models/section');
 
 /**
  * @swagger
@@ -45,7 +45,6 @@ router.get('/progress', function (req, res, next) {
  */
 router.get('/progress/:userID', async function (req, res, next) {
     let searchResult = await Progress.findOne({ courseCode: req.body.courseCode, className: req.body.className, sectionName: req.body.sectionName });
-
     if (!searchResult) {
         Progress.find({ userID: req.params.userID })
             .then(function (progress) {
@@ -57,7 +56,6 @@ router.get('/progress/:userID', async function (req, res, next) {
     } else {
         res.status(400).send({ message: `courseCode: ${req.body.courseCode}, className: ${req.body.className}, sectionName: ${req.body.sectionName}, already exists!` })
     }
-
 });
 
 /**
@@ -208,6 +206,166 @@ router.post('/progress', function (req, res, next) {
         .catch(res => {
             res.status(500).send({ "message": "Server error" })
         });
+});
+
+/**
+ * @swagger
+ * /progress:
+ *  put:
+ *    summary: Updates a sectionMaterial into existing progress record, creates progress record if does not exist.
+ *    tags: [progress]
+ *    requestBody:
+ *      required: true
+ *      content: 
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              courseCode:
+ *                type: string
+ *                default: "IS442"
+ *              className:
+ *                type: string
+ *                default: "G14"
+ *              sectionName:
+ *                type: string
+ *                default: "Machine Learning"
+ *              userID:
+ *                type: string
+ *                default: "1"
+ *              sectionMaterialName:
+ *                type: string
+ *                default: "Scrum Primer"
+ *            required:
+ *              - courseCode
+ *              - className
+ *              - sectionName
+ *              - userID
+ *              - sectionMaterialName
+ *    responses:
+ *      '200':
+ *        description: Updated Progress record
+ *      '500':
+ *        description: Server error
+ */
+// updates a progress record, otherwise add a new progress to database
+router.put('/progress', async function (req, res, next) {
+    let progressResult = await Progress.findOne({
+        courseCode: req.body.courseCode,
+        className: req.body.className,
+        sectionName: req.body.sectionName,
+        userID: req.body.userID
+    });
+
+    if (progressResult) {
+        // progress exists
+        if (progressResult.sectionMaterialName.includes(req.body.sectionMaterialName)) {
+            // section material already inside
+            res.status(200).send(progressResult)
+        } else {
+            // section material not inside yet
+            progressResult.sectionMaterialName.push(req.body.sectionMaterialName)
+            Progress.findOneAndUpdate({
+                courseCode: req.body.courseCode,
+                className: req.body.className,
+                sectionName: req.body.sectionName,
+                userID: req.body.userID
+            }, { sectionMaterialName: progressResult.sectionMaterialName }, { new: true })
+                .then(function (progressUpdated) {
+                    res.status(200).send(progressUpdated);
+                })
+                .catch(res => {
+                    res.status(500).send({ "message": "Server error" })
+                })
+        }
+    } else {
+        // progress does not exist
+        Progress.create(req.body)
+            .then(function (progressCreated) {
+                res.status(200).send(progressCreated);
+            })
+            .catch(res => {
+                res.status(500).send({ "message": "Server error" })
+            });
+    }
+});
+
+/**
+ * @swagger
+ * /progress/quiz:
+ *  put:
+ *    summary: Updates quiz to pass, creates record with passed quiz if does not exist.
+ *    tags: [progress]
+ *    requestBody:
+ *      required: true
+ *      content: 
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              courseCode:
+ *                type: string
+ *                default: "IS442"
+ *              className:
+ *                type: string
+ *                default: "G14"
+ *              sectionName:
+ *                type: string
+ *                default: "Machine Learning"
+ *              userID:
+ *                type: string
+ *                default: "1"
+ *            required:
+ *              - courseCode
+ *              - className
+ *              - sectionName
+ *              - userID
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ *      '500':
+ *        description: Server error
+ */
+// updates a progress record, otherwise add a new progress to database
+router.put('/progress/quiz', async function (req, res, next) {
+    let progressResult = await Progress.findOne({
+        courseCode: req.body.courseCode,
+        className: req.body.className,
+        sectionName: req.body.sectionName,
+        userID: req.body.userID
+    });
+
+    if (progressResult) {
+        // progress exists, update quiz to pass
+        progressResult.sectionMaterialName.push(req.body.sectionMaterialName)
+        Progress.findOneAndUpdate({
+            courseCode: req.body.courseCode,
+            className: req.body.className,
+            sectionName: req.body.sectionName,
+            userID: req.body.userID
+        }, { isSectionQuizComplete: true }, { new: true })
+            .then(function (progressUpdated) {
+                res.status(200).send(progressUpdated);
+            })
+            .catch(res => {
+                res.status(500).send({ "message": "Server error" })
+            })
+    } else {
+        // progress does not exist
+        Progress.create({
+            courseCode: req.body.courseCode,
+            className: req.body.className,
+            sectionName: req.body.sectionName,
+            userID: req.body.userID,
+            isSectionQuizComplete: true
+        })
+            .then(function (progressCreated) {
+                res.status(200).send(progressCreated);
+            })
+            .catch(res => {
+                res.status(500).send({ "message": "Server error" })
+            });
+    }
 });
 
 // /**
