@@ -24,6 +24,10 @@ const SectionSchema = new Schema({
         type: Array,
         required: [true, 'quizDetails is required']
     },
+    quizDuration: {
+        type: Number,
+        required: [true, 'quizDuration is required']
+    },
     // array of objects, [{materialName: "something", materialLink: "www.google.com"}, ...]
     sectionMaterial: {
         type: Array,
