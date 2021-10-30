@@ -10,15 +10,20 @@ const courseEligibility = ({courseDoc, userArray, classDoc}) =>
 
         userArray.forEach(user => {
             let enrolmentEligibility = true;
+            let completedCourseCodes = [];
             let learningCourses = user.learningCourses;
             let teachingCourses = user.teachingCourses;
             let completedCourses = user.completedCourses;
+            // [["IS111","24/25"],["IS442","23/25"]]
+            completedCourses.forEach(element => {
+                completedCourseCodes.push(element[0]);
+            });
 
             if (learningCourses.includes(courseCode)) {
                 enrolmentEligibility = false;
             } else if (teachingCourses.includes(courseCode)) {
                 enrolmentEligibility = false;
-            } else if (completedCourses.includes(courseCode)) {
+            } else if (completedCourseCodes.includes(courseCode)) {
                 enrolmentEligibility = false;
             } else {
                 // user has no affiliation to this course
