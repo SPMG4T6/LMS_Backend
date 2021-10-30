@@ -198,6 +198,9 @@ router.get('/section/material/:courseCode/:className/:sectionName/:materialName'
  *                        type: string
  *                    answer:
  *                      type: string
+ *              quizDuration:
+ *                type: integer
+ *                example: 10
  *              sectionMaterial:
  *                type: array
  *                items:
@@ -221,6 +224,7 @@ router.get('/section/material/:courseCode/:className/:sectionName/:materialName'
  *              - sectionName
  *              - sectionSequence
  *              - quizDetails
+ *              - quizDuration
  *              - sectionMaterial
  *    responses:
  *      '200':
@@ -299,9 +303,6 @@ router.post('/section', upload.array("myFile"), (req, res) => {
  *                        type: string
  *                    answer:
  *                      type: string
- *                    duration:
- *                      type: integer
- *                      example: 10
   *            required:
   *              - courseCode
   *              - className
