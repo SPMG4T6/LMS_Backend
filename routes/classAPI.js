@@ -548,8 +548,8 @@ router.put('/class/quiz', function (req, res, next) {
  * @swagger
  * /class/enrolmentdate:
  *  put:
- *    summary: Update the start enrolment and end enrolment dates
- *    description: Replaces the start and end enrolment dates in the database with your request body's start and end enrolment dates
+ *    summary: Update the class and enrolment dates
+ *    description: Replaces the class and enrolment dates in the database with your request body's class and enrolment dates
  *    tags: [class]
  *    requestBody:
  *      required: true
