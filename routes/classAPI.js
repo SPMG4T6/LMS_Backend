@@ -314,24 +314,24 @@ router.get('/class/view/enrolledUsers/:courseCode/:className', async function (r
  *        description: Server error
  */
 // add a new class to database
-router.post('/class', async function(req,res){
-  let searchResult = await ClassModel.findOne({courseCode: req.body.courseCode, className: req.body.className});
+router.post('/class', async function (req, res) {
+  let searchResult = await ClassModel.findOne({ courseCode: req.body.courseCode, className: req.body.className });
   if (!searchResult) {
     const trainerIDArray = req.body.userID;
     const courseCode = req.body.courseCode;
     trainerIDArray.forEach(element => {
-      User.findOne({userID: element})
-      .then(response => {
-        const teachingCourses = response.teachingCourses;
-        if (!teachingCourses.includes(courseCode)) {
-          teachingCourses.push(courseCode);
-        }
-        User.findOneAndUpdate({userID: element}, {teachingCourses: teachingCourses}, {new: true}, (err, doc) => {
+      User.findOne({ userID: element })
+        .then(response => {
+          const teachingCourses = response.teachingCourses;
+          if (!teachingCourses.includes(courseCode)) {
+            teachingCourses.push(courseCode);
+          }
+          User.findOneAndUpdate({ userID: element }, { teachingCourses: teachingCourses }, { new: true }, (err, doc) => {
             if (err) { res.status(500).send({ message: "Server error" }) };
             if (doc) { } // returns the update
             else { res.status(404).send({ message: "User " + element + " does not exist" }) }
+          })
         })
-      })
     })
     ClassModel.create(req.body)
       .then(response => {
@@ -562,6 +562,10 @@ router.put('/class/quiz', function (req, res, next) {
  *                type: string
  *              className:
  *                type: string
+ *              classStartDate:
+ *                type: string
+ *              classEndDate:
+ *                type: string
  *              enrolmentStartDate:
  *                type: string
  *              enrolmentEndDate:
@@ -569,6 +573,8 @@ router.put('/class/quiz', function (req, res, next) {
  *            required:
  *              - courseCode
  *              - className
+ *              - classStartDate
+ *              - classEndDate
  *              - enrolmentStartDate
  *              - enrolmentEndDate
  *    responses:
@@ -581,11 +587,18 @@ router.put('/class/quiz', function (req, res, next) {
  */
 // Update a grade quiz for the class
 router.put('/class/enrolmentdate', function (req, res, next) {
-  ClassModel.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className }, { enrolmentStartDate: req.body.enrolmentStartDate, enrolmentEndDate: req.body.enrolmentEndDate }, { new: true }, (err, doc) => {
-    if (err) { res.status(500).send({ message: "Server error" }) };
-    if (doc) { res.status(200).send(doc); } // returns the update
-    else { res.status(404).send({ message: "Class " + req.body.className + " do not exist" }) }
-  })
+  ClassModel.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className },
+    {
+      classStartDate: req.body.classStartDate,
+      classEndDate: req.body.classEndDate,
+      enrolmentEndDate: req.body.enrolmentEndDate,
+      enrolmentEndDate: req.body.enrolmentEndDate
+    },
+    { new: true }, (err, doc) => {
+      if (err) { res.status(500).send({ message: "Server error" }) };
+      if (doc) { res.status(200).send(doc); } // returns the update
+      else { res.status(404).send({ message: "Class " + req.body.className + " do not exist" }) }
+    })
 })
 
 /**
