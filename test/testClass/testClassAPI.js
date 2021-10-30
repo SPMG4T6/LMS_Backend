@@ -1,7 +1,7 @@
 const request = require("supertest");
 const app = require("../../index");
 const expect = require("chai").expect;
-const { Class, Quiz, NotExistQuiz, Answer, WrongAnswer, Enrol, NotExistEnrol, Course, Course1, PrereqCourse, User, PrereqUser, Class1, PrereqClass } = require("./classSchema.js")
+const { Class, Quiz, NotExistQuiz, Answer, WrongAnswer, Enrol, NotExistEnrol, Course, Course1, PrereqCourse, User, PrereqUser, Class1, PrereqClass, PrereqEnrol } = require("./classSchema.js")
 
 describe("TDD for Class", () => {
 
@@ -98,7 +98,7 @@ describe("TDD for Class", () => {
       request(app).get("/api/class/view/eligibleUsers/IS999000/G111222").expect(404, done);
     })
  
-    // Enrolled students ?????????????????
+    // Enrolled students in a Course Class
     it("GET Enrolled Students with courseCode & className: /api/class/view/enrolledUsers/" + Class.courseCode + "/" + Class.className, (done) => {
       request(app).get("/api/class/view/enrolledUsers/" + Class.courseCode + "/" + Class.className).expect(200, done);
     })
@@ -118,9 +118,61 @@ describe("TDD for Class", () => {
       request(app).put("/api/class/quiz").send(NotExistQuiz).expect(404, done);
     })
 
-    it("PUT Learner Enrolling: /api/enrol/" + User.userID, (done) => {
-      request(app).put("/api/class/enrol/" + User.userID).send(Enrol).expect(200, done);
+    it("PUT Learner Enrolling: /api/class/enrol/" + User.userID, async () => {
+      const user = await request(app).get("/api/user/" + User.userID);
+      const classResponse = await request(app).get("/api/class/view/" + Class.courseCode + "/" + Class.className);
+
+      // before
+      expect(user.body[0].learningCourses).to.not.includes(Class.courseCode);
+      expect(classResponse.body[0].enrolledStudents).to.not.includes(User.userID);
+
+      const response = await request(app).put("/api/class/enrol/" + User.userID).send(Enrol);
+      expect(response.status).to.eql(200);
+      
+      // after
+      const enrolledUser = await request(app).get("/api/user/" + User.userID);
+      const updatedClassResponse = await request(app).get("/api/class/view/" + Class.courseCode + "/" + Class.className);
+      expect(enrolledUser.body[0].learningCourses).to.includes(Class.courseCode);
+      expect(updatedClassResponse.body[0].enrolledStudents).to.includes(User.userID);
     })
+
+    // With prereq
+    it("PUT Learner WITH Prerequisites Enrolling for a class with Prerequisites: /api/class/enrol/" + PrereqUser.userID, async () => {
+      const user = await request(app).get("/api/user/" + PrereqUser.userID);
+      const classResponse = await request(app).get("/api/class/view/" + PrereqClass.courseCode + "/" + PrereqClass.className);
+
+      // before
+      expect(user.body[0].learningCourses).to.not.includes(PrereqClass.courseCode);
+      expect(classResponse.body[0].enrolledStudents).to.not.includes(PrereqUser.userID);
+
+      const response = await request(app).put("/api/class/enrol/" + PrereqUser.userID).send(PrereqEnrol);
+      expect(response.status).to.eql(200);
+      
+      // after
+      const enrolledUser = await request(app).get("/api/user/" + PrereqUser.userID);
+      const updatedClassResponse = await request(app).get("/api/class/view/" + PrereqClass.courseCode + "/" + PrereqClass.className);
+      expect(enrolledUser.body[0].learningCourses).to.includes(PrereqClass.courseCode);
+      expect(updatedClassResponse.body[0].enrolledStudents).to.includes(PrereqUser.userID);
+    })
+
+    // Without the required Prereq course
+    // it("PUT Learner WITHOUT Prerequisites Enrolling for a class with Prerequisites: /api/class/enrol/" + User.userID, async () => {
+    //   const user = await request(app).get("/api/user/" + User.userID);
+    //   const classResponse = await request(app).get("/api/class/view/" + PrereqClass.courseCode + "/" + PrereqClass.className);
+
+    //   // before
+    //   expect(user.body[0].learningCourses).to.not.includes(PrereqClass.courseCode);
+    //   expect(classResponse.body[0].enrolledStudents).to.not.includes(User.userID);
+
+    //   const response = await request(app).put("/api/class/enrol/" + User.userID).send(PrereqEnrol);
+    //   expect(response.status).to.eql(200);
+      
+    //   // after
+    //   const enrolledUser = await request(app).get("/api/user/" + User.userID);
+    //   const updatedClassResponse = await request(app).get("/api/class/view/" + PrereqClass.courseCode + "/" + PrereqClass.className);
+    //   expect(enrolledUser.body[0].learningCourses).to.includes(PrereqClass.courseCode);
+    //   expect(updatedClassResponse.body[0].enrolledStudents).to.includes(User.userID);
+    // })
 
     it("PUT Learner Enrolling (Non-existent courseCode & className): /api/enrol/" + User.userID, (done) => {
       request(app).put("/api/class/enrol/" + User.userID).send(NotExistEnrol).expect(404, done);

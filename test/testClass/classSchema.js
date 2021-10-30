@@ -10,10 +10,10 @@ module.exports.Class = {
       "option": [
         "print()", "print[]", "printNow()"
       ],
-      "answer": "0",
-      "duration": 10
+      "answer": "0"
     }
   ],
+  "quizDuration": 10,
   "classStartDate": "22/06/2021",
   "classEndDate": "15/10/2021",
   "enrolmentStartDate": "15/06/2021",
@@ -34,10 +34,10 @@ module.exports.Quiz = {
       "option": [
         "print()", "print[]", "printNow()"
       ],
-      "answer": "0",
-      "duration": 10
+      "answer": "0"
     }
   ],
+  "quizDuration": 10
 }
 
 module.exports.NotExistQuiz = {
@@ -49,10 +49,10 @@ module.exports.NotExistQuiz = {
       "option": [
         "input()", "scanner.nextLine()", "input[]", "next()"
       ],
-      "answer": "0",
-      "duration": 10
+      "answer": "0"
     }
-  ]
+  ],
+  "quizDuration": 10
 }
 
 module.exports.Answer = {
@@ -130,8 +130,7 @@ module.exports.Class1 = {
         "left",
         "right"
       ],
-      "answer": "upwards",
-      "duration": 10
+      "answer": "upwards"
     },
     {
       "question": "What is the right way to eat?",
@@ -139,8 +138,7 @@ module.exports.Class1 = {
         "Yes",
         "No"
       ],
-      "answer": "Yes",
-      "duration": 10
+      "answer": "Yes"
     },
     {
       "question": "Can birds play?",
@@ -148,8 +146,7 @@ module.exports.Class1 = {
         "Yes",
         "No"
       ],
-      "answer": "Yes",
-      "duration": 10
+      "answer": "Yes"
     },
     {
       "question": "What is the color of China flag?",
@@ -158,8 +155,7 @@ module.exports.Class1 = {
         "Blue",
         "purple"
       ],
-      "answer": "Red",
-      "duration": 10
+      "answer": "Red"
     },
     {
       "question": "Why are you gay?",
@@ -168,10 +164,10 @@ module.exports.Class1 = {
         "I am not",
         "I am only human"
       ],
-      "answer": "I am only human",
-      "duration": 10
+      "answer": "I am only human"
     }
   ],
+  "quizDuration": 10,
   "classStartDate": "22/06/2021",
   "classEndDate": "15/10/2021",
   "enrolmentStartDate": "15/06/2021",
@@ -220,10 +216,10 @@ module.exports.PrereqClass = {
       "option": [
         "for i in 5", "for(int i = 0; i < 5; i++)", "for(i < 5)"
       ],
-      "answer": "0",
-      "duration": 10
+      "answer": "0"
     }
   ],
+  "quizDuration": 10,
   "classStartDate": "22/06/2021",
   "classEndDate": "15/10/2021",
   "enrolmentStartDate": "15/06/2021",
@@ -233,4 +229,9 @@ module.exports.PrereqClass = {
   "enrolledStudents": [
     
   ]
+}
+
+module.exports.PrereqEnrol = {
+  "courseCode": "IS777",
+  "className": "G222"
 }
