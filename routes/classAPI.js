@@ -342,6 +342,7 @@ router.post('/class', async function (req, res) {
           sectionName: "Section 1",
           sectionSequence: 1,
           quizDetails: [],
+          quizDuration: 10,
           sectionMaterial: []
         })
           .then(function (sectionCreated) {
