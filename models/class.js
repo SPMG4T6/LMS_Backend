@@ -23,7 +23,8 @@ const ClassSchema = new Schema({
     },
     quizDuration: {
         type: Number,
-        required: [true, 'quizDuration is required']
+        required: [true, 'quizDuration is required'],
+        default: 10
     },
     classStartDate: {
         type: String,
