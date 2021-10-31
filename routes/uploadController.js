@@ -23,6 +23,9 @@ const uploadController = (req) =>
         let tracker = {};
         let result = [];
         materialNameArray.forEach(element => {
+            if (element == "") {
+                return;
+            };
             if (!(element in tracker)) {
                 tracker[element] = 1;
                 result.push(element);

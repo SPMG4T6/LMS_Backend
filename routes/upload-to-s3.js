@@ -44,7 +44,7 @@ const uploadToS3 = ({materialName, file, folderName}) =>
                 reject(err);
             }
             if (data) {
-                fs.unlinkSync(file.path);
+                // fs.unlinkSync(file.path);
                 let s3PubUrl = data.Location;
                 resolve({materialName, s3PubUrl});
             }

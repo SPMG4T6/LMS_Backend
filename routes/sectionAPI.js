@@ -241,13 +241,18 @@ router.post('/section', upload.array("myFile"), (req, res) => {
     delete req.body.myURL;
     req.body["sectionMaterial"] = sectionMaterial;
     req.body["quizDetails"] = [];
+    req.body["quizDuration"] = 10;
     Section.create(req.body)
     .then(function(section) {
       console.log("section created");
-      res.send(section);
+      res.status(200).send(section);
     }) 
     .catch(function(error) {
       console.log(error);
+      res.status(500).send({
+        message: "Server error",
+        data: error
+      })
     })
   }) 
 });
