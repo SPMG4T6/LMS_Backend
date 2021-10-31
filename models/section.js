@@ -22,11 +22,11 @@ const SectionSchema = new Schema({
     // [{question: "Something", option: [1, 2, 3, 4], answer: 1}, ...]
     quizDetails: {
         type: Array,
-        required: [true, 'quizDetails is required']
+        default: []
     },
     quizDuration: {
         type: Number,
-        required: [true, 'quizDuration is required']
+        default: 10
     },
     // array of objects, [{materialName: "something", materialLink: "www.google.com"}, ...]
     sectionMaterial: {
