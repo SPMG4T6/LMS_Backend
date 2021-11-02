@@ -88,7 +88,7 @@ module.exports.Course = {
   "prereqCourses": [
     
   ],
-  "quizPassingMark": "50"
+  "quizPassingMark": 50
 }
 
 module.exports.Course1 = {
@@ -98,7 +98,7 @@ module.exports.Course1 = {
   "prereqCourses": [
     
   ],
-  "quizPassingMark": "60"
+  "quizPassingMark": 60
 }
 
 module.exports.User = {
@@ -201,7 +201,7 @@ module.exports.PrereqCourse = {
   "prereqCourses": [
     "IS888"
   ],
-  "quizPassingMark": "70"
+  "quizPassingMark": 70
 }
 
 module.exports.PrereqClass = {
@@ -234,4 +234,36 @@ module.exports.PrereqClass = {
 module.exports.PrereqEnrol = {
   "courseCode": "IS777",
   "className": "G222"
+}
+
+module.exports.Section = {
+  "courseCode": "CS555",
+  "className": "G1",
+  "sectionName": "Introduction to Cybersecurity",
+  "sectionSequence": 1,
+  "quizDetails": [
+    {
+      "question": "What is IP?",
+      "option": [
+        "Internal dressing", "Internet Protocol", "Internally Producing"
+      ],
+      "answer": "Internet Protocol"
+    },
+  {
+      "question": "Can you change your subnet mask?",
+      "option": [
+        "Yes", "No"
+      ],
+      "answer": "Yes"
+    },
+  {
+      "question": "You can remove your firewall. True or False.",
+      "option": [
+        "True", "False"
+      ],
+      "answer": "True"
+    }
+  ],
+  "quizDuration": 10,
+  "sectionMaterial": []
 }

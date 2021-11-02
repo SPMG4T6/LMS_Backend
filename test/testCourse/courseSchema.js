@@ -5,7 +5,7 @@ module.exports.Course1 = {
     "prereqCourses": [
     
     ],
-    "quizPassingMark": "70"
+    "quizPassingMark": 70
 }
 
 module.exports.Course1Update = {
@@ -13,5 +13,5 @@ module.exports.Course1Update = {
     "courseDescription": "Updated course description",
     "prereqCourses": [
     ],
-    "quizPassingMark": "75"
+    "quizPassingMark": 75
 }

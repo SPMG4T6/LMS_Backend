@@ -28,16 +28,16 @@ describe("TDD for Class", () => {
 
   // CREATE
   describe("POST Endpoints", () => {
-    it("POST Specific: /api/class", (done) => {
+    it("POST Create Class: /api/class", (done) => {
       request(app).post("/api/class").send(Class).expect(200, done);
     })
 
-    it("POST Duplicate: /api/class", (done) => {
+    it("POST Create Duplicate Class: /api/class", (done) => {
       request(app).post("/api/class").send(Class).expect(400, done);
     })
 
-    it("POST Auto Grading (FAIL): /api/class/quiz/ungraded/" + User.userID, async () => {
-      const response = await request(app).post("/api/class/quiz/ungraded/" + User.userID).send(WrongAnswer); // using class1
+    it("POST Graded Auto Grading (FAIL): /api/class/quiz/graded/" + User.userID, async () => {
+      const response = await request(app).post("/api/class/quiz/graded/" + User.userID).send(WrongAnswer); // using class1
       const user = await request(app).get("/api/user/" + User.userID);
 
       expect(response.body.status).to.eql(false);
@@ -45,7 +45,7 @@ describe("TDD for Class", () => {
       expect(user.body[0].completedCourses).to.not.include(Course1.courseCode)
     }).timeout(5000);
 
-    it("POST Auto Grading (PASS): /api/class/quiz/graded/" + User.userID, async () => {
+    it("POST Graded Auto Grading (PASS): /api/class/quiz/graded/" + User.userID, async () => {
       const response = await request(app).post("/api/class/quiz/graded/" + User.userID).send(Answer); // using class1
       const user = await request(app).get("/api/user/" + User.userID);
 
@@ -53,6 +53,9 @@ describe("TDD for Class", () => {
       expect(user.body[0].learningCourses).to.not.includes(Course1.courseCode)
       expect(user.body[0].completedCourses).to.deep.include([ Course1.courseCode, response.body.marks ])
     }).timeout(5000);
+
+    // POST Ungraded Auto Grading (PASS)
+    // POST Ungraded Auto Grading (FAIL)
   });
 
   // GET

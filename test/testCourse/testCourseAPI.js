@@ -54,7 +54,7 @@ describe("TDD for Course", () => {
             expect(res.status).to.equal(200);
             expect(res.body).to.have.property("courseTitle", "Updated course title");
             expect(res.body).to.have.property("courseDescription", "Updated course description");
-            expect(res.body).to.have.property("quizPassingMark", "75");
+            expect(res.body).to.have.property("quizPassingMark", 75);
         });
     
         it("Updating course details of a non-existent course", async () => {
