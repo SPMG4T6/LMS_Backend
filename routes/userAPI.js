@@ -62,6 +62,65 @@ router.get('/user/:userID', function (req, res, next) {
 
 /**
  * @swagger
+ * /user/completed/:userID/:courseCode:
+ *  get:
+ *    summary: Return completed = true and quiz result if course has been completed, completed = false if course has not been completed
+ *    tags: [user]
+ *    parameters:
+ *        - in: path
+ *          name: userID
+ *          schema:
+ *            type: string
+ *          required: true
+ *          example: 1
+ *          description: A user's ID
+ *        - in: path
+ *          name: courseCode
+ *          schema:
+ *            type: string
+ *          required: true
+ *          example: CS555
+ *          description: The course code of the course
+ *    responses:
+ *      '200':
+ *        description: A successful response indicating if user has completed course or not
+ *      '404':
+ *        description: No user with specified userID was found
+ *      '500':
+ *        description: Server error
+ */
+router.get('/user/completed/:userID/:courseCode', function (req, res, next) {
+    User.find({ userID: req.params.userID })
+        .then(function (users) {
+            if (users.length > 0) {
+                // user found
+                completedCourses = users[0].completedCourses;
+                var completedCourseFound = false
+                var quizScore = ""
+                for (let i = 0; i < completedCourses.length; i++) {
+                    if (completedCourses[i][0] == req.params.courseCode) {
+                        completedCourseFound = true
+                        quizScore = completedCourses[i][1]
+                    }
+                }
+                if (completedCourseFound) {
+                    res.status(200).send({ "completed": true, "quizScore": quizScore })
+                } else {
+                    // course not found in completed list
+                    res.status(200).send({ "completed": false })
+                }
+            } else {
+                // user not found
+                res.status(404).send({ "message": "No user with specified userID was found" })
+            }
+        })
+        .catch(response => {
+            res.status(500).send({ "message": "Server error" })
+        });
+});
+
+/**
+ * @swagger
  * /user:
  *  post:
  *    summary: Create a user
@@ -181,7 +240,7 @@ router.put('/user', function (req, res, next) {
         if (doc !== null) {
             res.status(200).send(doc);
         } else {
-            res.status(404).send( {"message": "User not found"} )
+            res.status(404).send({ "message": "User not found" })
         }
     });
 });
