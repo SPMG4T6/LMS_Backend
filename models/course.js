@@ -21,8 +21,9 @@ const CourseSchema = new Schema({
         type: Array
     },
     quizPassingMark: {
-        type: String,
-        required: [true, 'quizPassingMark is required']
+        type: Number,
+        required: [true, 'quizPassingMark is required'],
+        default: 85
     }
 });
 

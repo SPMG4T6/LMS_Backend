@@ -97,8 +97,8 @@ router.get('/course/view/:courseCode', function(req,res) {
  *                items:
  *                  type: string
  *              quizPassingMark:
- *                type: string
- *                example: 70
+ *                type: Number
+ *                example: 85
  *            required:
  *              - courseCode
  *              - courseTitle

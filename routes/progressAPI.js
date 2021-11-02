@@ -1,5 +1,4 @@
 const express = require('express');
-const progress = require('../models/progress');
 const router = express.Router();
 const Progress = require('../models/progress');
 
