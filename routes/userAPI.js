@@ -62,9 +62,10 @@ router.get('/user/:userID', function (req, res, next) {
 
 /**
  * @swagger
- * /user/completed/:userID/:courseCode:
+ * /user/completed/{userID}/{courseCode}:
  *  get:
- *    summary: Return completed = true and quiz result if course has been completed, completed = false if course has not been completed
+ *    summary: Check if a user has completed a specific course
+ *    description: Return completed = true and quiz result if course has been completed, completed = false if course has not been completed
  *    tags: [user]
  *    parameters:
  *        - in: path
