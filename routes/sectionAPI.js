@@ -101,11 +101,20 @@ router.get('/sections/:courseCode/:className', function(req, res, next) {
  */
 // get a section within a specific class of a specific course
 router.get('/sections/:courseCode/:className/:sectionName', function(req, res, next) {
-  Section.find({"courseCode": req.params.courseCode, "className": req.params.className, "sectionName": req.params.sectionName.replace("+", " ")})
-  .then(function(sections) {
-    res.send(sections);
+  Section.find({"courseCode": req.params.courseCode, "className": req.params.className, "sectionName": req.params.sectionName.split("+").join(" ")})
+  .then(response => {
+    if (response.length > 0) {
+      res.status(200).send(response);
+    }
+    else {
+      res.status(404).send({
+        message: "No section found"
+      })
+    }
   })
-  .catch(next);
+  .catch(err => {
+    res.status(500).send(err);
+  });
 }) 
 
 /**

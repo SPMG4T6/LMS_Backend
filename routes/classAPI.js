@@ -161,7 +161,7 @@ router.get('/class/view/eligibleUsers/:courseCode/:className', async function (r
           .then(response => {
             if (response.length > 0) {
               // console.log(response);
-              res.send(response);
+              res.status(200).send(response);
             }
             else {
               res.status(404).send({ message: `No eligible learners available for this course` })
