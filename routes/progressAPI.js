@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Progress = require('../models/progress');
+const Section = require('../models/section');
+const returnCompletedSection = require('./returnCompletedSection');
 
 /**
  * @swagger
@@ -157,6 +159,58 @@ router.get('/progress/:courseCode/:className/:sectionName/:userID', async functi
         res.status(404).send({ message: "Progress not found" })
     }
 });
+
+/**
+ * @swagger
+ * /progress/completedSections/retrieve/{courseCode}/{className}/{userID}:
+ *  get:
+ *    summary: Get list of ccompleted sections for a specified course, class and user
+ *    tags: [progress]
+ *    parameters:
+ *        - in: path
+ *          name: courseCode
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The course code of the course
+ *        - in: path
+ *          name: className
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The class name within the course
+ *        - in: path
+ *          name: userID
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: A user's ID
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ *      '500':
+ *        description: Server error
+ */
+// Return an array of completed sections
+router.get("/progress/completedSections/retrieve/:courseCode/:className/:userID", async function(req, res, next) {
+    let sectionSearch = await Section.find({courseCode: req.params.courseCode, className:req.params.className});
+    let progressSearch = await Progress.find({courseCode: req.params.courseCode, className:req.params.className, userID: req.params.userID})
+
+    returnCompletedSection({sections: sectionSearch, progresses:progressSearch})
+    .then(response => {
+        if (response.length > 0) {
+            res.status(200).send(response);
+        }
+        else {
+            res.status(404).send({
+                message: `No completed sections for ${req.params.userID} for ${req.params.courseCode} ${req.params.className}`
+            })
+        }
+    })
+    .catch(err => {
+        res.status(500).send(err);
+    })
+})
 
 /**
  * @swagger
