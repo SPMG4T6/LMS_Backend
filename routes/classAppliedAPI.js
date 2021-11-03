@@ -218,7 +218,7 @@ router.post('/classApplied',function(req,res){
  *        description: Server error
  */
 //delete a class application from the database
-router.delete('/classApplied/:courseCode/:className/:userID', function(req,res) {
+router.delete('/classApplied/delete/:courseCode/:className/:userID', function(req,res) {
   classApplied.findOneAndDelete({courseCode: req.params.courseCode, className: req.params.className, userID: req.params.userID})
   .exec()
   .then(function(c) {
