@@ -6,12 +6,12 @@ const uploadController = require('./uploadController');
 
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-      cb(null, "public/files");
+    cb(null, "public/files");
   },
   filename: (req, file, cb) => {
-      const ext = file.mimetype.split("/")[1];
-      const fileName = file.originalname.split(".")[0];
-      cb(null, `${fileName}.${ext}`);
+    const ext = file.mimetype.split("/")[1];
+    const fileName = file.originalname.split(".")[0];
+    cb(null, `${fileName}.${ext}`);
   },
 });
 
@@ -30,10 +30,10 @@ const upload = multer({
  *        description: A successful response
  */
 // get a list of all sections from the database
-router.get('/sections',function(req,res,next) {
+router.get('/sections', function (req, res, next) {
   Section.find({})
-    .then(function(sections){
-        res.send(sections);
+    .then(function (sections) {
+      res.send(sections);
     })
     .catch(next);
 });
@@ -62,13 +62,13 @@ router.get('/sections',function(req,res,next) {
  *        description: A successful response
  */
 // get a list of all sections within a specific class of a specific course
-router.get('/sections/:courseCode/:className', function(req, res, next) {
-  Section.find({"courseCode": req.params.courseCode, "className": req.params.className})
-  .then(function(sections) {
-    res.send(sections);
-  })
-  .catch(next);
-}) 
+router.get('/sections/:courseCode/:className', function (req, res, next) {
+  Section.find({ "courseCode": req.params.courseCode, "className": req.params.className })
+    .then(function (sections) {
+      res.send(sections);
+    })
+    .catch(next);
+})
 
 /**
  * @swagger
@@ -100,22 +100,22 @@ router.get('/sections/:courseCode/:className', function(req, res, next) {
  *        description: A successful response
  */
 // get a section within a specific class of a specific course
-router.get('/sections/:courseCode/:className/:sectionName', function(req, res, next) {
-  Section.find({"courseCode": req.params.courseCode, "className": req.params.className, "sectionName": req.params.sectionName.split("+").join(" ")})
-  .then(response => {
-    if (response.length > 0) {
-      res.status(200).send(response);
-    }
-    else {
-      res.status(404).send({
-        message: "No section found"
-      })
-    }
-  })
-  .catch(err => {
-    res.status(500).send(err);
-  });
-}) 
+router.get('/sections/:courseCode/:className/:sectionName', function (req, res, next) {
+  Section.find({ "courseCode": req.params.courseCode, "className": req.params.className, "sectionName": req.params.sectionName.split("+").join(" ") })
+    .then(response => {
+      if (response.length > 0) {
+        res.status(200).send(response);
+      }
+      else {
+        res.status(404).send({
+          message: "No section found"
+        })
+      }
+    })
+    .catch(err => {
+      res.status(500).send(err);
+    });
+})
 
 /**
  * @swagger
@@ -158,9 +158,9 @@ router.get('/sections/:courseCode/:className/:sectionName', function(req, res, n
  *        description: A successful response
  */
 // Returning the specific document hyperlink
-router.get('/section/material/:courseCode/:className/:sectionName/:materialName', async function(req,res,next) {
-  const doc = await Section.findOne({courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName})
-  
+router.get('/section/material/:courseCode/:className/:sectionName/:materialName', async function (req, res, next) {
+  const doc = await Section.findOne({ courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName })
+
   if (doc === null) res.status(404).json({ error: "Section do not " + req.params.materialName });
 
   const material = req.params.materialName;
@@ -242,28 +242,28 @@ router.get('/section/material/:courseCode/:className/:sectionName/:materialName'
 // add a new section of class to database
 router.post('/section', upload.array("myFile"), (req, res) => {
   uploadController(req)
-  .then((response) => {
-    const sectionMaterial = response;
+    .then((response) => {
+      const sectionMaterial = response;
 
-    delete req.body.materialName;
-    delete req.body.materialType;
-    delete req.body.myURL;
-    req.body["sectionMaterial"] = sectionMaterial;
-    req.body["quizDetails"] = [];
-    req.body["quizDuration"] = 10;
-    Section.create(req.body)
-    .then(function(section) {
-      console.log("section created");
-      res.status(200).send(section);
-    }) 
-    .catch(function(error) {
-      console.log(error);
-      res.status(500).send({
-        message: "Server error",
-        data: error
-      })
+      delete req.body.materialName;
+      delete req.body.materialType;
+      delete req.body.myURL;
+      req.body["sectionMaterial"] = sectionMaterial;
+      req.body["quizDetails"] = [];
+      req.body["quizDuration"] = 10;
+      Section.create(req.body)
+        .then(function (section) {
+          console.log("section created");
+          res.status(200).send(section);
+        })
+        .catch(function (error) {
+          console.log(error);
+          res.status(500).send({
+            message: "Server error",
+            data: error
+          })
+        })
     })
-  }) 
 });
 
 
@@ -327,12 +327,12 @@ router.post('/section', upload.array("myFile"), (req, res) => {
  *        description: A successful response
  */
 // Update an ungraded quiz for the section
-router.put('/section/quiz/:courseCode/:className/:sectionName', async function(req,res,next){
+router.put('/section/quiz/:courseCode/:className/:sectionName', async function (req, res, next) {
 
   let quizDetails = req.body.quizDetails;
 
   // replaces the entire quiz details
-  Section.findOneAndUpdate({courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName}, { quizDetails: quizDetails }, { new: true }, (err, doc) => {
+  Section.findOneAndUpdate({ courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName }, { quizDetails: quizDetails }, { new: true }, (err, doc) => {
     if (err) { res.status(404).json({ error: "Section not found" }) };
     res.send(doc);
   });
@@ -402,53 +402,104 @@ router.put('/section/quiz/:courseCode/:className/:sectionName', async function(r
  */
 // Update section materials for a specific section
 router.post('/section/updateMaterials', upload.array("myFile"), (req, res) => {
-  
+
   // const sectionName = req.params.sectionName.replace("+", " ");
-  Section.find({courseCode: req.body.courseCode, className: req.body.className, sectionName: req.body.sectionName})
-  .then(function(section) {
-    let retrievedSectionMaterialArray = section[0].sectionMaterial;
-    // console.log("retrievedSectionMaterialArray");
-    // console.log(retrievedSectionMaterialArray);
-    let retrievedMaterialNameArray = [];
-    retrievedSectionMaterialArray.forEach(element => {
-      let retrievedMaterialName = element['materialName'];
-      retrievedMaterialNameArray.push(retrievedMaterialName);
-    });
-    
-    uploadController(req)
-    .then((response) => {
-      const sectionMaterial = response;
-      // console.log(sectionMaterial);
-      sectionMaterial.forEach(element => {
-        let materialName = element['materialName'];
-        if (!retrievedMaterialNameArray.includes(materialName)) {
-          retrievedSectionMaterialArray.push(element);
-        }
-        else {
-          let obj = retrievedSectionMaterialArray.find((o,i) => {
-            if (o.materialName == materialName) {
-              retrievedSectionMaterialArray[i] = element;
-            }
-          })
-        }
-      });
-      // console.log("Final sectionMaterial to be updated");
+  Section.find({ courseCode: req.body.courseCode, className: req.body.className, sectionName: req.body.sectionName })
+    .then(function (section) {
+      let retrievedSectionMaterialArray = section[0].sectionMaterial;
+      // console.log("retrievedSectionMaterialArray");
       // console.log(retrievedSectionMaterialArray);
+      let retrievedMaterialNameArray = [];
+      retrievedSectionMaterialArray.forEach(element => {
+        let retrievedMaterialName = element['materialName'];
+        retrievedMaterialNameArray.push(retrievedMaterialName);
+      });
 
-      Section.findOneAndUpdate({courseCode: req.body.courseCode, className: req.body.className, sectionName: req.body.sectionName}, {sectionMaterial: retrievedSectionMaterialArray}, {new: true}, (err, doc) => {
-        if (err) {
-          res.status(404).json({ error: "Section not found" }) 
-        };
-        console.log("Section Materials updated")
-        res.send(doc);
-      })
-    })
-    .catch(function(reason) {
-      console.log(reason);
-    })
+      uploadController(req)
+        .then((response) => {
+          const sectionMaterial = response;
+          // console.log(sectionMaterial);
+          sectionMaterial.forEach(element => {
+            let materialName = element['materialName'];
+            if (!retrievedMaterialNameArray.includes(materialName)) {
+              retrievedSectionMaterialArray.push(element);
+            }
+            else {
+              let obj = retrievedSectionMaterialArray.find((o, i) => {
+                if (o.materialName == materialName) {
+                  retrievedSectionMaterialArray[i] = element;
+                }
+              })
+            }
+          });
+          // console.log("Final sectionMaterial to be updated");
+          // console.log(retrievedSectionMaterialArray);
 
-  })
+          Section.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className, sectionName: req.body.sectionName }, { sectionMaterial: retrievedSectionMaterialArray }, { new: true }, (err, doc) => {
+            if (err) {
+              res.status(404).json({ error: "Section not found" })
+            };
+            console.log("Section Materials updated")
+            res.send(doc);
+          })
+        })
+        .catch(function (reason) {
+          console.log(reason);
+        })
+
+    })
 })
 
+/**
+ * @swagger
+ * /course/delete/{courseCode}/{className}/{sectionName}:
+ *  delete:
+ *    summary: Delete a section
+ *    tags: [section]
+ *    parameters:
+ *        - in: path
+ *          name: courseCode
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The course code
+ *        - in: path
+ *          name: className
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The class name
+ *        - in: path
+ *          name: sectionName
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: The section name
+ *    responses:
+ *      '200':
+ *        description: A successful response
+ */
+//delete a section from the database
+router.delete('/section/delete/:courseCode/:className/:sectionName', async function (req, res) {
+  let searchResult = await Section.find({ courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName });
+  if (searchResult.length <= 0) {
+    res.status(404).send({
+      message: "Section does not exist"
+    })
+  }
+  else {
+    Section.findOneAndDelete({ courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName })
+      .then(response => {
+        res.status(200).send({
+          message: `Section ${req.params.sectionName} from ${req.params.className} deleted`
+        });
+      })
+      .catch(error => {
+        res.status(500).send({
+          message: "Server error"
+        });
+      })
+  }
+})
 
 module.exports = router;
