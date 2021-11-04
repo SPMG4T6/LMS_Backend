@@ -19,24 +19,24 @@ const classApplied = require('../models/classApplied');
  *      '500':
  *        description: Server error
  */
-// get a list all classes applied by all learners from the database regardless of status
-router.get('/allClassApplied',function(req,res) {
-  ClassApplied.find({})
-    .then(response => {
-      if (response.length > 0) {
-        res.status(200).send(response);
-      }
-      else {
-        res.status(404).send({
-          message: "Unable to retrieve data"
+// get a list all classes applied by all learners from the database
+router.get('/allClassApplied', function (req, res) {
+    ClassApplied.find({})
+        .then(response => {
+            if (response.length > 0) {
+                res.status(200).send(response);
+            }
+            else {
+                res.status(404).send({
+                    message: "Unable to retrieve data"
+                })
+            }
         })
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Server error"
-      })
-    });
+        .catch(err => {
+            res.status(500).send({
+                message: "Server error"
+            })
+        });
 });
 
 /**
@@ -56,33 +56,29 @@ router.get('/allClassApplied',function(req,res) {
  *    responses:
  *      '200':
  *        description: A successful response
+ *      '404':
+ *        description: User not found
  *      '500':
  *        description: Server error
  */
-// get a list all classes applied by a specific learner from the database regardless of status
-router.get('/userClassApplied/:userID',async function(req,res) {
-  let searchResult = await User.findOne({userID: req.params.userID});
-  if (!searchResult) {
-    res.status(404).send({
-      message: `User ID ${req.params.userID} does not exist`
-    })
-  } else {
-    ClassApplied.find({userID: req.params.userID})
-      .then(response => {
-        if (response.length > 0) {
-          res.status(200).send(response);
-        } else {
-          res.status(404).send({
-            message: `${req.params.userID} does not have any class applications`
-          })
-        }
-      })
-      .catch(error => {
-        res.status(500).send({
-          messsage: "Server error"
+// get a list all classes applied by a specific learner from the database
+router.get('/userClassApplied/:userID', async function (req, res) {
+    let searchResult = await User.findOne({ userID: req.params.userID });
+    if (!searchResult) {
+        res.status(404).send({
+            message: `User ID ${req.params.userID} does not exist`
         })
-      });
-  }
+    } else {
+        ClassApplied.find({ userID: req.params.userID })
+            .then(response => {
+                res.status(200).send(response);
+            })
+            .catch(error => {
+                res.status(500).send({
+                    messsage: "Server error"
+                })
+            });
+    }
 });
 
 /**
@@ -110,31 +106,31 @@ router.get('/userClassApplied/:userID',async function(req,res) {
  *      '200':
  *        description: A successful response containing all the users who have applied for this class
  */
-// get a list all users who applied for a particular class in a particular course from the database regardless of status
-router.get('/classApplied/:courseCode/:className', async function(req,res) {
-  let promiseArray = [];
-  let courseSearch = await Course.findOne({courseCode: req.params.courseCode});
-  let classSearch = await Class.findOne({courseCode: req.params.courseCode, className: req.params.className});
-  if (!courseSearch) {
-    res.status(404).send({
-      message: `Course ${req.params.courseCode} not found`
-    });
-  }
-  else if (!classSearch) {
-    res.status(404).send({
-      message: `${req.params.courseCode} ${req.params.className} not found`
-    });
-  } else {
-    let classApplications = await ClassApplied.find({courseCode: req.params.courseCode, className: req.params.className});
-    // console.log(classApplications);
-    if (classApplications.length == 0) {
-      res.status(400).send({
-        message: `No applications for ${req.params.courseCode} ${req.params.className}`
-      })
-    } else {
-      res.status(200).send(classApplications);
+// get a list all users who applied for a particular class in a particular course from the database
+router.get('/classApplied/:courseCode/:className', async function (req, res) {
+    let promiseArray = [];
+    let courseSearch = await Course.findOne({ courseCode: req.params.courseCode });
+    let classSearch = await Class.findOne({ courseCode: req.params.courseCode, className: req.params.className });
+    if (!courseSearch) {
+        res.status(404).send({
+            message: `Course ${req.params.courseCode} not found`
+        });
     }
-  }
+    else if (!classSearch) {
+        res.status(404).send({
+            message: `${req.params.courseCode} ${req.params.className} not found`
+        });
+    } else {
+        let classApplications = await ClassApplied.find({ courseCode: req.params.courseCode, className: req.params.className });
+        // console.log(classApplications);
+        if (classApplications.length == 0) {
+            res.status(400).send({
+                message: `No applications for ${req.params.courseCode} ${req.params.className}`
+            })
+        } else {
+            res.status(200).send(classApplications);
+        }
+    }
 });
 
 /**
@@ -158,12 +154,6 @@ router.get('/classApplied/:courseCode/:className', async function(req,res) {
  *                type: string
  *              userName:
  *                type: string
- *              status:
- *                type: string
- *                enum:
- *                - Pending
- *                - Approved
- *                - Rejected
  *    responses:
  *      '200':
  *        description: A successful response
@@ -171,16 +161,21 @@ router.get('/classApplied/:courseCode/:className', async function(req,res) {
  *        description: Server error
  */
 // add a new class application by student to database
-router.post('/classApplied',function(req,res){
-  ClassApplied.create(req.body)
-    .then(function(classApplied){
-        res.status(200).send(classApplied);
-    })
-    .catch(error => {
-      res.status(500).send({
-        message: "Server error"
-      })
-    });
+router.post('/classApplied', async function (req, res, next) {
+    let searchResult = await ClassApplied.findOne({ courseCode: req.body.courseCode, className: req.body.className, userID: req.body.userID })
+    if (!searchResult) {
+        ClassApplied.create(req.body)
+            .then(function (classApplied) {
+                res.status(200).send(classApplied);
+            })
+            .catch(error => {
+                res.status(500).send({
+                    message: "Server error"
+                })
+            });
+    } else {
+        res.status(400).send({ "message": "classApplied record already exists!" })
+    }
 });
 
 /**
@@ -218,25 +213,25 @@ router.post('/classApplied',function(req,res){
  *        description: Server error
  */
 //delete a class application from the database
-router.delete('/classApplied/delete/:courseCode/:className/:userID', function(req,res) {
-  classApplied.findOneAndDelete({courseCode: req.params.courseCode, className: req.params.className, userID: req.params.userID})
-  .exec()
-  .then(function(c) {
-    if (c!=null) {
-      res.status(200).send({
-        message: `Application by ${req.params.userID} for ${req.params.courseCode} ${req.params.className} deleted`
-      })
-    } else {
-      res.status(404).send({
-        message: `Application by ${req.params.userID} for ${req.params.courseCode} ${req.params.className} does not exist`
-      })
-    }
-  })
-  .catch(error =>{
-    res.status(500).send({
-      message: "Server error"
-    })
-  })
+router.delete('/classApplied/delete/:courseCode/:className/:userID', function (req, res) {
+    classApplied.findOneAndDelete({ courseCode: req.params.courseCode, className: req.params.className, userID: req.params.userID })
+        .exec()
+        .then(function (c) {
+            if (c != null) {
+                res.status(200).send({
+                    message: `Application by ${req.params.userID} for ${req.params.courseCode} ${req.params.className} deleted`
+                })
+            } else {
+                res.status(404).send({
+                    message: `Application by ${req.params.userID} for ${req.params.courseCode} ${req.params.className} does not exist`
+                })
+            }
+        })
+        .catch(error => {
+            res.status(500).send({
+                message: "Server error"
+            })
+        })
 })
 
 module.exports = router;
