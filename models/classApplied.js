@@ -18,11 +18,6 @@ const ClassAppliedSchema = new Schema({
     userName: {
         type: String,
         required: [true, 'userName is required']
-    },
-    // 'Pending', 'Approved', 'Rejected'
-    status: {
-        type: String,
-        default: 'Pending'
     }
 });
 

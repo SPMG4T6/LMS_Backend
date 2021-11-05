@@ -53,7 +53,6 @@ app.use(express.json());
 
 // initialize routes
 app.use('/api', require('./routes/userAPI'));
-app.use('/api', require('./routes/gradeAPI'));
 app.use('/api', require('./routes/sectionAPI'));
 app.use('/api', require('./routes/classAPI'));
 app.use('/api', require('./routes/courseAPI'));
