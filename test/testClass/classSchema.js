@@ -1,3 +1,5 @@
+var today = new Date();
+
 module.exports.Class = {
   "courseCode": "IS999",
   "className": "G111",
@@ -69,6 +71,41 @@ module.exports.WrongAnswer = {
   "quizAnswers": [
     "upwards", "No", "Yes", "Purple", "hey"
   ]
+}
+
+module.exports.UngradedQuestions = {
+  "quizDetails": [
+    {
+      "question": "Is it possible to change the flow of electricity?",
+      "option": [
+        "Yes", "No"
+      ],
+      "answer": "Yes"
+    },
+    {
+      "question": "Does Python programming language have print?",
+      "option": [
+        "Yes", "No"
+      ],
+      "answer": "Yes"
+    },
+    {
+      "question": "It is not possible to do OOP in Python. True or False.",
+      "option": [
+        "True", "False"
+      ],
+      "answer": "False"
+    }
+  ]
+}
+
+module.exports.UngradedAnswer = {
+  "courseCode": "IS888",
+  "className": "G111",
+  "quizAnswers": [
+    "Yes", "Yes", "True"
+  ],
+  "sectionName": "Section 1"
 }
 
 module.exports.Enrol = {

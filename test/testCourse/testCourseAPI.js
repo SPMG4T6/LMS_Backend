@@ -1,7 +1,7 @@
 const request = require("supertest");
 const app = require("../../index");
 const expect = require("chai").expect;
-const {Course1, Course2, Course3, Course1Update, Course2Update} = require("./testCourseDataa");
+const {Course1, Course2, Course3, Course1Update, Course2Update} = require("./testCourseData");
 
 describe("TDD for Course", () => {
     describe("POST Endpoints", () => {
