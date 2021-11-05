@@ -114,15 +114,22 @@ router.post('/course', async function(req,res){
   let searchResult = await Course.findOne({courseCode: req.body.courseCode});
   // console.log(searchResult);
   if (!searchResult) {
-    Course.create(req.body)
-      .then(function(course){
-          res.status(200).send(course);
+    const quizPassingMark = req.body.quizPassingMark;
+    if (quizPassingMark < 0) {
+      res.status(400).send({
+        message:"Quiz Passing Marks cannot be negative"
       })
-      .catch(error => {
-        res.status(500).send({
-          message: "Server error"
+    } else {
+      Course.create(req.body)
+        .then(function(course){
+            res.status(200).send(course);
+        })
+        .catch(error => {
+          res.status(500).send({
+            message: "Server error"
+          });
         });
-      });
+    }
   }
   else {
     res.status(400).send({
@@ -183,6 +190,11 @@ router.put('/course/:courseCode', async function(req,res) {
   
   // To remove blank fields
   for (const [key, value] of Object.entries(fieldsToUpdate)) {
+    if (key == "prereqCourses") {
+      if (value.length == 0) {
+        delete fieldsToUpdate[key]
+      }
+    }
     if (!value) {
       delete fieldsToUpdate[key]
     }

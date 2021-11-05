@@ -3,6 +3,7 @@ const router = express.Router();
 const Section = require('../models/section');
 const multer = require("multer");
 const uploadController = require('./uploadController');
+const Class = require('../models/class');
 
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -160,15 +161,24 @@ router.get('/sections/:courseCode/:className/:sectionName', function (req, res, 
 // Returning the specific document hyperlink
 router.get('/section/material/:courseCode/:className/:sectionName/:materialName', async function (req, res, next) {
   const doc = await Section.findOne({ courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName })
-
-  if (doc === null) res.status(404).json({ error: "Section do not " + req.params.materialName });
-
-  const material = req.params.materialName;
-  for (let i = 0; i < doc.sectionMaterial.length; i++) {
-    if (doc.sectionMaterial[i].materialName = material) {
-      res.send(doc.sectionMaterial[i].materialLink)
+  let found = false;
+  if (!doc) {
+    res.status(404).json({ error: "Section does not exist " + req.params.materialName });
+  } else {
+    const materialName = req.params.materialName;
+    for (let i = 0; i < doc.sectionMaterial.length; i++) {
+      if (doc.sectionMaterial[i].materialName == materialName) {
+        found = true;
+        res.status(200).send(doc.sectionMaterial[i].materialLink)
+      }
+    }
+    if (!found) {
+      res.status(404).send({
+        message: "Material does not exist"
+      })
     }
   }
+
 });
 
 /**
@@ -240,30 +250,44 @@ router.get('/section/material/:courseCode/:className/:sectionName/:materialName'
  *        description: A successful response
  */
 // add a new section of class to database
-router.post('/section', upload.array("myFile"), (req, res) => {
-  uploadController(req)
-    .then((response) => {
-      const sectionMaterial = response;
-
-      delete req.body.materialName;
-      delete req.body.materialType;
-      delete req.body.myURL;
-      req.body["sectionMaterial"] = sectionMaterial;
-      req.body["quizDetails"] = [];
-      req.body["quizDuration"] = 10;
-      Section.create(req.body)
-        .then(function (section) {
-          console.log("section created");
-          res.status(200).send(section);
-        })
-        .catch(function (error) {
-          console.log(error);
-          res.status(500).send({
-            message: "Server error",
-            data: error
-          })
-        })
+router.post('/section', upload.array("myFile"), async (req, res) => {
+  let classDoc = await Class.findOne({courseCode: req.body.courseCode, className: req.body.className});
+  if (!classDoc) {
+    res.status(400).send({
+      message: `Class does not exist`
     })
+  } else {
+    let sectionDoc = await Section.findOne({courseCode: req.body.courseCode, className: req.body.className, sectionName: req.body.sectionName});
+    if (sectionDoc) {
+      res.status(400).send({
+        message: "Section already exists"
+      })
+    } else {
+      uploadController(req)
+        .then((response) => {
+          const sectionMaterial = response;
+    
+          delete req.body.materialName;
+          delete req.body.materialType;
+          delete req.body.myURL;
+          req.body["sectionMaterial"] = sectionMaterial;
+          req.body["quizDetails"] = [];
+          req.body["quizDuration"] = 10;
+          Section.create(req.body)
+            .then(function (section) {
+              console.log("section created");
+              res.status(200).send(section);
+            })
+            .catch(function (error) {
+              console.log(error);
+              res.status(500).send({
+                message: "Server error",
+                data: error
+              })
+            })
+        })
+    }
+  }
 });
 
 
@@ -327,14 +351,21 @@ router.post('/section', upload.array("myFile"), (req, res) => {
  *        description: A successful response
  */
 // Update an ungraded quiz for the section
-router.put('/section/quiz/:courseCode/:className/:sectionName', async function (req, res, next) {
+router.put('/section/quiz/:courseCode/:className/:sectionName', async function (req, res) {
 
   let quizDetails = req.body.quizDetails;
 
   // replaces the entire quiz details
   Section.findOneAndUpdate({ courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName }, { quizDetails: quizDetails }, { new: true }, (err, doc) => {
-    if (err) { res.status(404).json({ error: "Section not found" }) }
-    else { res.status(200).send(doc); }
+    if (err) { res.status(404).json({ error: "Section not found" }); return; };
+    if (!doc) {
+      res.status(404).send({
+        message: "Section not found"
+      })
+    }
+    else {
+      res.status(200).send(doc);
+    }
   });
 })
 
