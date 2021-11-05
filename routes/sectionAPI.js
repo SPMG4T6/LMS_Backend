@@ -351,14 +351,21 @@ router.post('/section', upload.array("myFile"), async (req, res) => {
  *        description: A successful response
  */
 // Update an ungraded quiz for the section
-router.put('/section/quiz/:courseCode/:className/:sectionName', async function (req, res, next) {
+router.put('/section/quiz/:courseCode/:className/:sectionName', async function (req, res) {
 
   let quizDetails = req.body.quizDetails;
 
   // replaces the entire quiz details
   Section.findOneAndUpdate({ courseCode: req.params.courseCode, className: req.params.className, sectionName: req.params.sectionName }, { quizDetails: quizDetails }, { new: true }, (err, doc) => {
-    if (err) { res.status(404).json({ error: "Section not found" }) };
-    res.send(doc);
+    if (err) { res.status(404).json({ error: "Section not found" }); return; };
+    if (!doc) {
+      res.status(404).send({
+        message: "Section not found"
+      })
+    }
+    else {
+      res.status(200).send(doc);
+    }
   });
 })
 
@@ -476,7 +483,7 @@ router.post('/section/updateMaterials', upload.array("myFile"), (req, res) => {
 
 /**
  * @swagger
- * /course/delete/{courseCode}/{className}/{sectionName}:
+ * /section/delete/{courseCode}/{className}/{sectionName}:
  *  delete:
  *    summary: Delete a section
  *    tags: [section]

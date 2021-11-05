@@ -440,8 +440,8 @@ router.post('/class/quiz/:quizType/:userID', async function (req, res, next) {
       // Setting of variables
       if (quizType === "ungraded") {
         let sectionDoc = await Section.findOne({ courseCode: req.body.courseCode, className: req.body.className, sectionName: req.body.sectionName }).exec();
-        if (sectionDoc === null) {
-          res.status(500).send({ message: "Please fill in sectionName" });
+        if (sectionDoc === null || sectionDoc === []) {
+          res.status(404).send({ message: "Unable to retrieve section" });
           return;
         }
         quizDetails = sectionDoc.quizDetails;
@@ -451,7 +451,7 @@ router.post('/class/quiz/:quizType/:userID', async function (req, res, next) {
         var passingMark = courseDoc.quizPassingMark; // it is in percentage
         updatedQuizDetails = classDoc.quizDetails;
       }
-      
+
       // Checks if question & answer length matches
       if (submittedAnswerList.length === quizDetails.length) {
 
@@ -474,11 +474,31 @@ router.post('/class/quiz/:quizType/:userID', async function (req, res, next) {
 
         if (quizType === "ungraded") {
           ProgressModel.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className, userID: req.params.userID }, { isSectionQuizComplete: true }, { new: true }, (err, doc) => {
-            if (err) { res.status(500).send({ message: "Server error" }) };
-            if (doc) { } // returns the update
-            else { res.status(404).send({ message: "Progress failed to update" }) }
+            if (err) { res.status(500).send({ message: "Server error" }); return; };
+            // status is always true -> ungraded quiz will always "pass"
+            if (doc) { res.status(200).send({ status: true, marks: marksOutput, quizDetails: updatedQuizDetails }); return; }  // returns the update
+            else { 
+              ProgressModel.create(
+                {
+                  "courseCode": req.body.courseCode,
+                  "className": req.body.className,
+                  "sectionName": req.body.sectionName,
+                  "userID": req.params.userID,
+                  "sectionMaterialName": [],
+                  "isSectionQuizComplete": true
+                }
+              )
+              .then(function (doc) {
+                res.status(200).send({ status: true, marks: marksOutput, quizDetails: updatedQuizDetails }); 
+                return;
+              })
+              .catch(err => {
+                res.status(500).send({ message: "Progress creating error. " + err });
+                return;
+              });
+            }
           })
-          res.status(200).send({ status: true, marks: marksOutput, quizDetails: updatedQuizDetails }) // status is always true -> ungraded quiz will always "pass"
+          
         } else {
           if (results >= passingMark) { // Passed the quiz
 
@@ -568,7 +588,7 @@ router.put('/class/quiz', function (req, res, next) {
   // console.log(req.body)
   // replaces the entire quiz details
   ClassModel.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className }, { quizDetails: quizDetails }, { new: true }, (err, doc) => {
-    if (err) { res.status(500).send({ message: "Server error" }) };
+    if (err) { res.status(500).send({ message: "Server error" }); return; };
     if (doc) { res.status(200).send(doc); } // returns the update
     else { res.status(404).send({ message: "Class " + req.body.className + " do not exist" }) }
   })
