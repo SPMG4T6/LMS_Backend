@@ -24,7 +24,7 @@ describe("TDD for Class", () => {
       expect(prereqClassResponse.status).to.eql(200);
       expect(userResponse.status).to.eql(200);
       expect(prereqUserResponse.status).to.eql(200);
-    }).timeout(5000)
+    })
   })
   
 
@@ -51,7 +51,7 @@ describe("TDD for Class", () => {
       expect(user.status).to.eql(200);
       expect(user.body[0].learningCourses).to.includes(Course1.courseCode)
       expect(user.body[0].completedCourses).to.not.include(Course1.courseCode)
-    }).timeout(5000);
+    })
 
     it("POST Graded Auto Grading (PASS): /api/class/quiz/graded/" + User.userID, async () => {
       const response = await request(app).post("/api/class/quiz/graded/" + User.userID).send(Answer); // using class1
@@ -63,7 +63,7 @@ describe("TDD for Class", () => {
       expect(user.status).to.eql(200);
       expect(user.body[0].learningCourses).to.not.includes(Course1.courseCode)
       expect(user.body[0].completedCourses).to.deep.include([ Course1.courseCode, response.body.marks ])
-    }).timeout(5000);
+    })
     
     // POST UNgraded Auto Grading - section is auto created when class is created
     it("POST UNgraded Auto Grading: /api/class/quiz/ungraded/" + User.userID, async () => {
@@ -75,7 +75,7 @@ describe("TDD for Class", () => {
       expect(response.body.marks).to.eql("2/3");
       expect(progress.status).to.eql(200);
       expect(progress.body.isSectionQuizComplete).to.eql(true); // shows that the isSectionQuizComplete flag is true
-    }).timeout(5000);
+    })
   });
 
   // GET
@@ -250,6 +250,6 @@ describe("TDD for Class", () => {
       expect(sectionResponse.status).to.eql(200);
       expect(course1SectionResponse.status).to.eql(200);
       expect(prereqCourseSectionResponse.status).to.eql(200);
-    }).timeout(5000)
+    })
   })
 })

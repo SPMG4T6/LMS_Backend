@@ -19,6 +19,6 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "mocha ./test/**/test*.js --exit --slow 0"
+    "test": "mocha ./test/**/test*.js --timeout 10000 --exit --slow 0"
   }
 }

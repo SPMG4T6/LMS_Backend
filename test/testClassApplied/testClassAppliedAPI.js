@@ -15,7 +15,7 @@ describe("TDD for classApplied", () => {
             expect(trainerResponse.status).to.eql(200);
             expect(courseResponse.status).to.eql(200);
             expect(classResponse.status).to.eql(200);
-        }).timeout(10000)
+        })
     });
 
     describe("POST Endpoints", () => {
@@ -96,6 +96,6 @@ describe("TDD for classApplied", () => {
             expect(courseResponse.status).to.eql(200);
             expect(trainerResponse.status).to.eql(200);
             expect(learnerResponse.status).to.eql(200);
-        }).timeout(10000)
+        })
     })
 })
