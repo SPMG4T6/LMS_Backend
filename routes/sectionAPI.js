@@ -264,6 +264,9 @@ router.post('/section', upload.array("myFile"), (req, res) => {
           })
         })
     })
+    .catch((err) => {
+      console.log(err)
+    })
 });
 
 
