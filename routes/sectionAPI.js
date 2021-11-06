@@ -256,9 +256,38 @@ router.post('/section', upload.array("myFile"), async (req, res) => {
     res.status(400).send({
       message: `Class does not exist`
     })
-    .catch((err) => {
-      console.log(err)
-    })
+  } else {
+    let sectionDoc = await Section.findOne({courseCode: req.body.courseCode, className: req.body.className, sectionName: req.body.sectionName});
+    if (sectionDoc) {
+      res.status(400).send({
+        message: "Section already exists"
+      })
+    } else {
+      uploadController(req)
+        .then((response) => {
+          const sectionMaterial = response;
+    
+          delete req.body.materialName;
+          delete req.body.materialType;
+          delete req.body.myURL;
+          req.body["sectionMaterial"] = sectionMaterial;
+          req.body["quizDetails"] = [];
+          req.body["quizDuration"] = 10;
+          Section.create(req.body)
+            .then(function (section) {
+              console.log("section created");
+              res.status(200).send(section);
+            })
+            .catch(function (error) {
+              console.log(error);
+              res.status(500).send({
+                message: "Server error",
+                data: error
+              })
+            })
+        })
+    }
+  }
 });
 
 
