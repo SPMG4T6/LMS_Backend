@@ -9,31 +9,12 @@ on:
     branches: [ main, heroku-deployment, testing ]
 
 jobs:
-  build-ubuntu:
-
-    runs-on: [ ubuntu-latest ]
-
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x]
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
-
-
   build-windows:
 
     runs-on: [ windows-latest ]
 
     strategy:
+      max-parallel: 1
       matrix:
         node-version: [14.x, 16.x]
 
@@ -51,9 +32,12 @@ jobs:
 
   build-macos:
 
+    needs: build-windows
+
     runs-on: [ macos-latest ]
 
     strategy:
+      max-parallel: 1
       matrix:
         node-version: [14.x, 16.x]
 
