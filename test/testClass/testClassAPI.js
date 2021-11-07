@@ -44,7 +44,7 @@ describe("TDD for Class", () => {
     it("POST Graded Auto Grading (FAIL): /api/class/quiz/graded/" + User.userID, async () => {
       const response = await request(app).post("/api/class/quiz/graded/" + User.userID).send(WrongAnswer); // using class1
       const user = await request(app).get("/api/user/" + User.userID);
-
+      
       expect(response.status).to.eql(200);
       expect(response.body.status).to.eql(false);
       expect(response.body.marks).to.eql("2/5");
