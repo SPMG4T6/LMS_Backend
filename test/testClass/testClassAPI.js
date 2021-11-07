@@ -153,7 +153,7 @@ describe("TDD for Class", () => {
       expect(classResponse.status).to.eql(200);
 
       // before
-      expect(user.body[0].learningCourses).to.not.includes(Class.courseCode);
+      expect(user.body[0].learningCourses).to.not.deep.includes([Class.courseCode, Class.className]);
       expect(classResponse.body[0].enrolledStudents).to.not.includes(User.userID);
 
       const response = await request(app).put("/api/class/enrol/" + User.userID).send(Enrol);
@@ -162,7 +162,7 @@ describe("TDD for Class", () => {
       // after
       const enrolledUser = await request(app).get("/api/user/" + User.userID);
       const updatedClassResponse = await request(app).get("/api/class/view/" + Class.courseCode + "/" + Class.className);
-      expect(enrolledUser.body[0].learningCourses).to.includes(Class.courseCode);
+      expect(enrolledUser.body[0].learningCourses).to.deep.includes([Class.courseCode, Class.className]);
       expect(updatedClassResponse.body[0].enrolledStudents).to.includes(User.userID);
     })
 
@@ -175,8 +175,8 @@ describe("TDD for Class", () => {
       expect(classResponse.status).to.eql(200);
 
       // before
-      expect(user.body[0].learningCourses).to.not.includes(PrereqClass.courseCode);
-      expect(classResponse.body[0].enrolledStudents).to.not.includes(PrereqUser.userID);
+      expect(user.body[0].learningCourses).to.not.includes([PrereqClass.courseCode, PrereqClass.className]);
+      expect(classResponse.body[0].enrolledStudents).to.not.deep.includes(PrereqUser.userID);
 
       const response = await request(app).put("/api/class/enrol/" + PrereqUser.userID).send(PrereqEnrol);
       expect(response.status).to.eql(200);
@@ -184,7 +184,7 @@ describe("TDD for Class", () => {
       // after
       const enrolledUser = await request(app).get("/api/user/" + PrereqUser.userID);
       const updatedClassResponse = await request(app).get("/api/class/view/" + PrereqClass.courseCode + "/" + PrereqClass.className);
-      expect(enrolledUser.body[0].learningCourses).to.includes(PrereqClass.courseCode);
+      expect(enrolledUser.body[0].learningCourses).to.deep.includes([PrereqClass.courseCode, PrereqClass.className]);
       expect(updatedClassResponse.body[0].enrolledStudents).to.includes(PrereqUser.userID);
     })
 
