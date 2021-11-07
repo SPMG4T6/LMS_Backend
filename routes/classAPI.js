@@ -437,22 +437,24 @@ router.post('/class/quiz/:quizType/:userID', async function (req, res, next) {
       var updatedQuizDetails = [];
       var marksObtained = 0;
 
-      if (submittedAnswerList.length == quizDetails.length) {
-        // Setting of variables
-        if (quizType === "ungraded") {
-          let sectionDoc = await Section.findOne({ courseCode: req.body.courseCode, className: req.body.className, sectionName: req.body.sectionName }).exec();
-          if (sectionDoc === null || sectionDoc === []) {
-            res.status(404).send({ message: "Unable to retrieve section" });
-            return;
-          }
-          quizDetails = sectionDoc.quizDetails;
-          updatedQuizDetails = sectionDoc.quizDetails;
-        } else {
-          quizDetails = classDoc.quizDetails;
-          var passingMark = courseDoc.quizPassingMark; // it is in percentage
-          updatedQuizDetails = classDoc.quizDetails;
+      
+      // Setting of variables
+      if (quizType === "ungraded") {
+        let sectionDoc = await Section.findOne({ courseCode: req.body.courseCode, className: req.body.className, sectionName: req.body.sectionName }).exec();
+        if (sectionDoc === null || sectionDoc === []) {
+          res.status(404).send({ message: "Unable to retrieve section" });
+          return;
         }
+        quizDetails = sectionDoc.quizDetails;
+        updatedQuizDetails = sectionDoc.quizDetails;
+      } else {
+        quizDetails = classDoc.quizDetails;
+        var passingMark = courseDoc.quizPassingMark; // it is in percentage
+        updatedQuizDetails = classDoc.quizDetails;
+      }
 
+      
+      if (submittedAnswerList.length == quizDetails.length) {
         // Calculating the total marks
         for (let i = 0; i < quizDetails.length; i++) {
 
