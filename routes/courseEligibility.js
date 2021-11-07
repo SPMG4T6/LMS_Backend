@@ -13,6 +13,7 @@ const courseEligibility = ({courseDoc, userArray, classDoc}) =>
             let learningCourseCodes = [];
             let completedCourseCodes = [];
             let learningCourses = user.learningCourses;
+
             learningCourses.forEach(element => {
                 learningCourseCodes.push(element[0]);
             });
@@ -41,7 +42,7 @@ const courseEligibility = ({courseDoc, userArray, classDoc}) =>
                     }
                     else {
                         coursePreReqArray.forEach(element => {
-                            if (!completedCourses.includes(element)) {
+                            if (!completedCourseCodes.includes(element)) {
                                 enrolmentEligibility = false;
                             }
                         });
