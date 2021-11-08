@@ -1,3 +1,5 @@
+// Primary Author: Wong Jian Hui
+
 const request = require("supertest");
 const app = require("../../index");
 const expect = require("chai").expect;
