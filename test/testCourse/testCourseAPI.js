@@ -1,3 +1,5 @@
+// Development Lead: Petras Tan
+
 const request = require("supertest");
 const app = require("../../index");
 const expect = require("chai").expect;
