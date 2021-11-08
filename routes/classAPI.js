@@ -523,7 +523,7 @@ router.post('/class/quiz/:quizType/:userID', async function (req, res, next) {
 
               if (quizType == "graded" && !completed) { // only update user if its "graded"
                 userLearningCourses.splice(learningCoursesIndex, 1);
-                userCompletedCourses.push([req.body.courseCode, marksOutput]);
+                userCompletedCourses.push([req.body.courseCode, req.body.className, marksOutput]);
                 user.learningCourses = userLearningCourses;
                 user.completedCourses = userCompletedCourses
 

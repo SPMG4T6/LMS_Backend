@@ -205,13 +205,13 @@ router.get("/progress/completedSections/retrieve/:courseCode/:className/:userID"
                 res.status(200).send(response);
             }
             else {
-                res.status(404).send({
+                res.status(200).send({
                     message: `No completed sections for ${req.params.userID} for ${req.params.courseCode} ${req.params.className}`
                 })
             }
         })
         .catch(err => {
-            res.status(500).send(err);
+            res.status(404).send(err);
         })
 })
 
