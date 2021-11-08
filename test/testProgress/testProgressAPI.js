@@ -85,7 +85,7 @@ describe("TDD for Progress", () => {
 
         it("GET completed sections by non existent userID: /api/progress/completedSections/retrieve/:courseCode/:className/:userID", async () => {
             const res = await request(app).get("/api/progress/completedSections/retrieve/" + Progress.courseCode + "/" + Progress.className + "/" + Progress.userID + "$$$");
-            expect(res.status).to.eql(404);
+            expect(res.status).to.eql(200);
             expect(res.body.message).to.eql("No completed sections for ClassAppliedUserTDDTestLearner$$$ for ClassAppliedTMS929 ClassAppliedG1")
         })
     })
