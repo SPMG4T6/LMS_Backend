@@ -275,7 +275,7 @@ router.post('/section', upload.array("myFile"), async (req, res) => {
           req.body["quizDuration"] = 10;
           Section.create(req.body)
             .then(function (section) {
-              console.log("section created");
+              // console.log("section created");
               res.status(200).send(section);
             })
             .catch(function (error) {
@@ -470,12 +470,12 @@ router.post('/section/updateMaterials', upload.array("myFile"), (req, res) => {
             if (err) {
               res.status(404).json({ error: "Section not found" })
             };
-            console.log("Section Materials updated")
+            // console.log("Section Materials updated")
             res.send(doc);
           })
         })
         .catch(function (reason) {
-          console.log(reason);
+          res.status(500).send(reason);
         })
 
     })
