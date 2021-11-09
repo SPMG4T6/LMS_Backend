@@ -53,7 +53,6 @@ app.use(express.json());
 
 // initialize routes
 app.use('/api', require('./routes/userAPI'));
-app.use('/api', require('./routes/gradeAPI'));
 app.use('/api', require('./routes/sectionAPI'));
 app.use('/api', require('./routes/classAPI'));
 app.use('/api', require('./routes/courseAPI'));
@@ -71,7 +70,7 @@ app.use(function(err,req,res,next){
 // listen for requests
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, function(){
-    console.log(`🚀 Server ready at http://localhost:${PORT}`);
+    console.log(`🚀 Server ready at ${options.definition.servers[0].url}`);
 });
 
 module.exports = app;

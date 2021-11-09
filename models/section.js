@@ -15,14 +15,18 @@ const SectionSchema = new Schema({
         type: String,
         required: [true, 'sectionName is required']
     },
-    sectionSequence: {
+    sectionSequence: {  
         type: Number,
         required: [true, 'sectionSequence is required']
     },
     // [{question: "Something", option: [1, 2, 3, 4], answer: 1}, ...]
     quizDetails: {
         type: Array,
-        required: [true, 'quizDetails is required']
+        default: []
+    },
+    quizDuration: {
+        type: Number,
+        default: 10
     },
     // array of objects, [{materialName: "something", materialLink: "www.google.com"}, ...]
     sectionMaterial: {

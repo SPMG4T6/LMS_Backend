@@ -19,7 +19,11 @@ const ClassSchema = new Schema({
     // [{question: "Something", option: [1, 2, 3, 4], answer: 1}, ...]
     quizDetails: {
         type: Array,
-        required: [true, 'quizDetails is required']
+        default: []
+    },
+    quizDuration: {
+        type: Number,
+        default: 10
     },
     classStartDate: {
         type: String,

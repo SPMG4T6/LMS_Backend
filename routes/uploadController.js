@@ -11,7 +11,8 @@ const uploadController = (req) =>
         let promiseArray = [];
         let toUploadCounter = 0;
         let urlCounter = 0;
-        let folderName = req.body.courseCode + "." + req.body.className;
+        let sectionName = req.body.sectionName;
+        let folderName = req.body.courseCode + "_" + req.body.className + "_" + sectionName.split(" ").join("_");
 
         // array of file objects
         const filesArray = req.files;
@@ -19,18 +20,30 @@ const uploadController = (req) =>
 
         // array of the material name, matches filesArray by index
         const materialNameArray = req.body.materialName;
-        // console.log(materialNameArray);
+        let tracker = {};
+        let result = [];
+        materialNameArray.forEach(element => {
+            if (element == "") {
+                return;
+            };
+            if (!(element in tracker)) {
+                tracker[element] = 1;
+                result.push(element);
+            } else {
+                tracker[element] += 1;
+                result.push(element+"_"+tracker[element]);
+            }
+        });
 
         // array of material type to track the index
         const materialTypeArray = req.body.materialType;
 
         // array of url types
         const urlArray = req.body.myURL;
-        // console.log(urlArray);
 
         for (var i = 0; i < req.body.materialName.length; i++) {
             let materialObject = {};
-            let currMaterialName = materialNameArray[i];
+            let currMaterialName = result[i];
             if (currMaterialName != "") {
                 let currMaterialType = materialTypeArray[i];
                 if (currMaterialType == "uploadType") {
@@ -42,7 +55,6 @@ const uploadController = (req) =>
                     materialObject["materialName"] = currMaterialName;
                     if (Array.isArray(urlArray)) {
                         const filtered = urlArray.filter(element => element !== "");
-                        // console.log(filtered);
                         urlCounter++;
                         materialObject["materialLink"] = filtered[urlCounter-1];
                     }

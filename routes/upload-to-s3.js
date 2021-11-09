@@ -8,12 +8,12 @@ AWS.config.update({
     secretAccessKey: process.env.SECRETACCESSKEY
 });
 
-const getParams = (file, contentType, folderName) => {
+const getParams = (file, contentType, folderName, materialName) => {
     return {
         Bucket: "spm-g4t6-is212",
-        Key: `${folderName}/`+ file.originalname,
+        Key: `${folderName}/`+ materialName,
         Body: fs.createReadStream(file.path),
-        ContentDisposition: 'inline; filename=' + file.originalname,
+        ContentDisposition: 'inline; filename=' + materialName,
         ACL:'public-read',
         ContentType :contentType,
     };
@@ -38,13 +38,13 @@ const uploadToS3 = ({materialName, file, folderName}) =>
         else if (fileType == "xls" | fileType == "xlsx") {
             contentType = "application/mspowerpoint";
         }
-        const params = getParams(file, contentType, folderName);
+        const params = getParams(file, contentType, folderName, materialName);
         s3.upload(params, (err, data) => {
             if (err) {
                 reject(err);
             }
             if (data) {
-                fs.unlinkSync(file.path);
+                // fs.unlinkSync(file.path);
                 let s3PubUrl = data.Location;
                 resolve({materialName, s3PubUrl});
             }
