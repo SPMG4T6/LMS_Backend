@@ -123,8 +123,7 @@ describe("TDD for Class", () => {
     it("GET (Prerequisites) Eligible Users with courseCode & className: /api/class/view/eligibleUsers/" + PrereqClass.courseCode + "/" + PrereqClass.className, async () => {
       const response = await request(app).get("/api/class/view/eligibleUsers/" + PrereqClass.courseCode + "/" + PrereqClass.className);
       const user = await request(app).get("/api/user/" + PrereqUser.userID);
-      console.log("RESPONSE: ", response.body);
-      console.log("USER: ", user.body);
+      
       expect(response.status).to.eql(200);
       expect(response.body).to.deep.include(user.body[0]); // to prove that it exists
     })
