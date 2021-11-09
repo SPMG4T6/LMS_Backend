@@ -222,7 +222,11 @@ describe("TDD for Class", () => {
       const prereqCourseSectionResponse = await request(app).delete("/api/section/delete/" + PrereqClass.courseCode + "/" + PrereqClass.className + "/Section 1"); // delete the prereqCourse's automatically created section
       const userResponse = await request(app).delete("/api/user/" + User.userID);
       const prereqUserResponse = await request(app).delete("/api/user/" + PrereqUser.userID);
-  
+
+      // Clearing progress details created by ungraded auto grading test case
+      const deleteProgress = await request(app).delete("/api/progress/" + Class1.courseCode + "/" + Class1.className + "/" + UngradedAnswer.sectionName + "/" + User.userID)
+      expect(deleteProgress.status).to.eql(200);
+      
       expect(courseResponse.status).to.eql(200);
       expect(course1Response.status).to.eql(200);
       expect(class1Response.status).to.eql(200);
