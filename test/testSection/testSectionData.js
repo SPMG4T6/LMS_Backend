@@ -131,5 +131,5 @@ module.exports.Section1MaterialsUpdate = {
     "materialName": [ 'M2', 'Test doc', 'M1', 'TestCopy ppt' ],
     "myURL": ['https://www.youtube.com/watch?v=hRok6zPZKMA','','www.google.com',''],
     "materialType": [ 'urlType', 'uploadType', 'urlType', 'uploadType' ],
-    "myFile": [`C:/wamp64/www/SPM/LMS_Backend/test/testSection/test.docx`, `C:/wamp64/www/SPM/LMS_Backend/test/testSection/testCopy.pptx`]
+    "myFile": [`./test/testSection/test.docx`, `./test/testSection/testCopy.pptx`]
 }
