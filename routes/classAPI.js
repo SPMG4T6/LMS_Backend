@@ -499,7 +499,7 @@ router.post('/class/quiz/:quizType/:userID', async function (req, res, next) {
             }
           })
           
-        } else {
+        } else { // graded
           if (results >= passingMark) { // Passed the quiz
             
             let userLearningCourses = user.learningCourses;

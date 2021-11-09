@@ -11,10 +11,10 @@ describe("TDD for Class", () => {
     it("Creating dependencies", async () => {
       const courseResponse = await request(app).post("/api/course").send(Course);
       const course1Response = await request(app).post("/api/course").send(Course1);
-      const prereqResponse = await request(app).post("/api/course").send(PrereqCourse);
-      const class1Response = await request(app).post("/api/class").send(Class1);
-      const prereqClassResponse = await request(app).post("/api/class").send(PrereqClass);
       const userResponse = await request(app).post("/api/user").send(User);
+      const class1Response = await request(app).post("/api/class").send(Class1); // section is automatically created
+      const prereqResponse = await request(app).post("/api/course").send(PrereqCourse);
+      const prereqClassResponse = await request(app).post("/api/class").send(PrereqClass); // section is automatically created
       const prereqUserResponse = await request(app).post("/api/user").send(PrereqUser);
       const updateSectionQuiz = await request(app).put("/api/section/quiz/" + Class1.courseCode + "/" + Class1.className + "/Section 1").send(UngradedQuestions); // update the quiz details of auto created section
       
@@ -22,9 +22,9 @@ describe("TDD for Class", () => {
       expect(courseResponse.status).to.eql(200);
       expect(course1Response.status).to.eql(200);
       expect(class1Response.status).to.eql(200);
+      expect(userResponse.status).to.eql(200);
       expect(prereqResponse.status).to.eql(200);
       expect(prereqClassResponse.status).to.eql(200);
-      expect(userResponse.status).to.eql(200);
       expect(prereqUserResponse.status).to.eql(200);
     })
   })
@@ -51,8 +51,8 @@ describe("TDD for Class", () => {
       expect(response.body.status).to.eql(false);
       expect(response.body.marks).to.eql("2/5");
       expect(user.status).to.eql(200);
-      expect(user.body[0].learningCourses).to.includes(Course1.courseCode)
-      expect(user.body[0].completedCourses).to.not.include(Course1.courseCode)
+      expect(user.body[0].learningCourses).to.deep.includes([Course1.courseCode, Class1.className])
+      expect(user.body[0].completedCourses).to.not.deep.include([Course1.courseCode, Class1.className, response.body.marks])
     })
 
     it("POST Graded Auto Grading (PASS): /api/class/quiz/graded/" + User.userID, async () => {
@@ -63,8 +63,8 @@ describe("TDD for Class", () => {
       expect(response.body.status).to.eql(true);
       expect(response.body.marks).to.eql("3/5");
       expect(user.status).to.eql(200);
-      expect(user.body[0].learningCourses).to.not.includes(Course1.courseCode)
-      expect(user.body[0].completedCourses).to.deep.include([ Course1.courseCode, response.body.marks ])
+      expect(user.body[0].learningCourses).to.not.includes([Course1.courseCode, Class1.className])
+      expect(user.body[0].completedCourses).to.deep.include([ Course1.courseCode, Class1.className, response.body.marks ])
     })
     
     // POST UNgraded Auto Grading - section is auto created when class is created
@@ -123,9 +123,10 @@ describe("TDD for Class", () => {
     it("GET (Prerequisites) Eligible Users with courseCode & className: /api/class/view/eligibleUsers/" + PrereqClass.courseCode + "/" + PrereqClass.className, async () => {
       const response = await request(app).get("/api/class/view/eligibleUsers/" + PrereqClass.courseCode + "/" + PrereqClass.className);
       const user = await request(app).get("/api/user/" + PrereqUser.userID);
-
+      console.log("RESPONSE: ", response.body);
+      console.log("USER: ", user.body);
       expect(response.status).to.eql(200);
-      expect(response.body).to.eql(user.body); // to prove that it exists
+      expect(response.body).to.deep.include(user.body[0]); // to prove that it exists
     })
     
     // Enrolled students in a Course Class

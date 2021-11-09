@@ -1,5 +1,3 @@
-var today = new Date();
-
 module.exports.Class = {
   "courseCode": "IS999",
   "className": "G111",
@@ -141,9 +139,9 @@ module.exports.Course1 = {
 module.exports.User = {
   "userID": "999",
   "userName": "Tester_Learner",
-  "userType": "learner",
+  "userType": "Learner",
   "learningCourses": [
-    "IS888"
+    [ 'IS888', 'G111' ]
   ],
   "teachingCourses": [
     
@@ -219,7 +217,7 @@ module.exports.Class1 = {
 module.exports.PrereqUser = {
   "userID": "777",
   "userName": "Tester_PrereqLearner",
-  "userType": "learner",
+  "userType": "Learner",
   "learningCourses": [
     
   ],
@@ -227,7 +225,11 @@ module.exports.PrereqUser = {
     
   ],
   "completedCourses": [
-    "IS888"
+    [
+      "IS888",
+      "G111",
+      "4/5"
+    ]
   ]
 }
 
