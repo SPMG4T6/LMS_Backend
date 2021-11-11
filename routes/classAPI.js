@@ -473,7 +473,7 @@ router.post('/class/quiz/:quizType/:userID', async function (req, res, next) {
         let results = (marksObtained / quizDetails.length) * 100; //  calculating the result
 
         if (quizType === "ungraded") {
-          ProgressModel.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className, userID: req.params.userID }, { isSectionQuizComplete: true }, { new: true }, (err, doc) => {
+          ProgressModel.findOneAndUpdate({ courseCode: req.body.courseCode, className: req.body.className, sectionName: req.body.sectionName, userID: req.params.userID }, { isSectionQuizComplete: true }, { new: true }, (err, doc) => {
             if (err) { res.status(500).send({ message: "Server error" }); return; };
             // status is always true -> ungraded quiz will always "pass"
             if (doc) { res.status(200).send({ status: true, marks: marksOutput, quizDetails: updatedQuizDetails }); return; }  // returns the update
