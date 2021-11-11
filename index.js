@@ -28,7 +28,7 @@ const options = {
     },
     servers: [
       {
-        url: "https://lmsbackendapi-production.herokuapp.com/api/"
+        url: "https://lmsbackendapi.herokuapp.com/api/"
       }
     ],
   },
