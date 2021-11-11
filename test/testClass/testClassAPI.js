@@ -1,9 +1,9 @@
-// Development Lead: Jason
+// Development Lead: Jason Chew Jia Wang
 
 const request = require("supertest");
 const app = require("../../index");
 const expect = require("chai").expect;
-const { Class, Quiz, NotExistQuiz, Answer, WrongAnswer, UngradedQuestions, UngradedAnswer, Enrol, NotExistEnrol, Course, Course1, PrereqCourse, User, PrereqUser, Class1, PrereqClass, PrereqEnrol } = require("./classSchema.js")
+const { Class, Quiz, NotExistQuiz, Answer, WrongAnswer, UngradedQuestions, UngradedAnswer, Enrol, NotExistEnrol, Course, Course1, PrereqCourse, User, PrereqUser, Class1, PrereqClass, PrereqEnrol } = require("./testClassData.js")
 
 describe("TDD for Class", () => {
 
