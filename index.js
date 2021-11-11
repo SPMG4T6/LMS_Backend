@@ -17,18 +17,18 @@ const options = {
   definition: {
     openapi: "3.0.3", // present supported openapi version
     info: {
-      title: "LMS Backend API", // short title.
-      description: "LMS Backend", //  desc.
+      title: "LMS Backend API (Production)", // short title.
+      description: "LMS Production Backend API Documentation", //  desc.
       version: "1.0.0", // version number
-      // contact: {
-      //   name: "John doe", // your name
-      //   email: "john@web.com", // your email
-      //   url: "web.com", // your website
-      // },
+      contact: {
+        name: "Frontend", // your name
+        url: "http://spm-lms-development.s3-website-ap-southeast-1.amazonaws.com/", // your website
+      },
     },
     servers: [
       {
-        url: "https://lmsbackendapi.herokuapp.com/api/"
+        url: "https://lmsbackendapi-production.herokuapp.com/api/",
+        description: "Backend Production Server"
       }
     ],
   },
@@ -63,7 +63,6 @@ app.use('/api', require('./routes/classAppliedAPI'));
 
 // error handling middleware
 app.use(function(err,req,res,next){
-    //console.log(err);
     res.status(422).send({error: err.message});
 });
 
