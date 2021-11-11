@@ -1,9 +1,9 @@
-// Development Lead: Jason
+// Development Lead: Jason Chew Jia Wang
 
 const request = require("supertest");
 const app = require("../../index");
 const expect = require("chai").expect;
-const { Class, Quiz, NotExistQuiz, Answer, WrongAnswer, UngradedQuestions, UngradedAnswer, Enrol, NotExistEnrol, Course, Course1, PrereqCourse, User, PrereqUser, Class1, PrereqClass, PrereqEnrol } = require("./classSchema.js")
+const { Class, Quiz, NotExistQuiz, Answer, WrongAnswer, UngradedQuestions, UngradedAnswer, Enrol, NotExistEnrol, Course, Course1, PrereqCourse, User, PrereqUser, Class1, PrereqClass, PrereqEnrol } = require("./testClassData.js")
 
 describe("TDD for Class", () => {
 
@@ -123,8 +123,7 @@ describe("TDD for Class", () => {
     it("GET (Prerequisites) Eligible Users with courseCode & className: /api/class/view/eligibleUsers/" + PrereqClass.courseCode + "/" + PrereqClass.className, async () => {
       const response = await request(app).get("/api/class/view/eligibleUsers/" + PrereqClass.courseCode + "/" + PrereqClass.className);
       const user = await request(app).get("/api/user/" + PrereqUser.userID);
-      console.log("RESPONSE: ", response.body);
-      console.log("USER: ", user.body);
+      
       expect(response.status).to.eql(200);
       expect(response.body).to.deep.include(user.body[0]); // to prove that it exists
     })
